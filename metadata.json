@@ -1,0 +1,5 @@
+{
+  "name": "Interactive Terminal Portfolio",
+  "description": "An interactive portfolio designed as a retro terminal. Users can issue commands to view skills, experience, and projects, or even play classic games like Snake and a Flappy Bird clone. The interface features a dynamic, physics-based rope simulation for a unique visual experience.",
+  "requestFramePermissions": []
+}

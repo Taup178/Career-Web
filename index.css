@@ -1,0 +1,166 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Caveat:wght@400;700&display=swap');
+
+:root {
+  color-scheme: dark;
+  --bg: #07090a;
+  --panel: rgba(18, 21, 25, 0.92);
+  --panel-strong: rgba(22, 26, 32, 0.98);
+  --surface: rgba(26, 30, 36, 0.95);
+  --text: #ece8dc;
+  --muted: #9e968b;
+  --accent: #d4a657;
+  --accent-glow: rgba(212, 166, 87, 0.4);
+  --accent-soft: #e0b86c;
+  --border: rgba(212, 166, 87, 0.22);
+  --shadow: 0 24px 80px rgba(0, 0, 0, 0.4);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text);
+  background: radial-gradient(circle at 15% 15%, rgba(212, 166, 87, 0.09), transparent 35%),
+              radial-gradient(circle at 85% 85%, rgba(212, 166, 87, 0.06), transparent 35%),
+              linear-gradient(180deg, #060809 0%, #101316 50%, #080a0b 100%);
+  background-attachment: fixed;
+  overflow-x: hidden;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.glass-panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.glass-panel-strong {
+  background: var(--panel-strong);
+  border: 1px solid rgba(212, 166, 87, 0.28);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.btn-accent {
+  background: linear-gradient(135deg, #e5b967 0%, #c89842 100%);
+  color: #0f1214;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(212, 166, 87, 0.25);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-accent:hover,
+.btn-accent:focus-visible {
+  background: linear-gradient(135deg, #f0c675 0%, #d4a34b 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(212, 166, 87, 0.4);
+}
+
+.btn-soft {
+  background-color: rgba(212, 166, 87, 0.12);
+  border: 1px solid rgba(212, 166, 87, 0.2);
+  color: var(--text);
+  transition: all 0.2s ease;
+}
+
+.btn-soft:hover,
+.btn-soft:focus-visible {
+  background-color: rgba(212, 166, 87, 0.22);
+  border-color: rgba(212, 166, 87, 0.4);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+
+.math-grid-paper,
+.bg-sim-bg {
+  background-color: #141210;
+  background-image: 
+    linear-gradient(to right, rgba(220, 80, 80, 0.45) 2px, transparent 2px),
+    linear-gradient(to right, rgba(212, 166, 87, 0.28) 1.5px, transparent 1.5px),
+    linear-gradient(to bottom, rgba(212, 166, 87, 0.28) 1.5px, transparent 1.5px),
+    linear-gradient(to right, rgba(212, 166, 87, 0.12) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(212, 166, 87, 0.12) 1px, transparent 1px);
+  background-position: 48px 0, 0 0, 0 0, 0 0, 0 0;
+  background-size: 100% 100%, 100px 100px, 100px 100px, 20px 20px, 20px 20px;
+}
+
+.font-handwritten {
+  font-family: 'Caveat', cursive;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(212, 166, 87, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(212, 166, 87, 0.45);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 3s infinite ease-in-out;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.animate-blink {
+  animation: blink 1s step-end infinite;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(212, 166, 87, 0.3);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(212, 166, 87, 0.5);
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
