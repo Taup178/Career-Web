@@ -279,12 +279,6 @@ const PacmanGame: React.FC<PacmanGameProps> = ({ stopGame, onMatrixNotification,
         if (!remainingDots) {
           setIsVictory(true);
         }
-
-        // Check Matrix Notification trigger
-        if (scoreRef.current >= 200 && !matrixNotificationShown) {
-          onMatrixNotification();
-          setMatrixNotificationShown(true);
-        }
       }
 
       // Frightened timer decrement
