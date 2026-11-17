@@ -49,7 +49,7 @@ export const terminalResponses: { [key: string]: string } = {
     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━<br>
     <span class="italic font-bold uppercase text-[#d4a657]">Email:</span> zamokuhlemaziya944@gmail.com<br>
     <span class="italic font-bold uppercase text-[#d4a657]">LinkedIn:</span> linkedin.com/in/zamokuhle-maziya<br>
-    <span class="italic font-bold uppercase text-[#d4a657]">GitHub:</span> github.com/ZamokuhleMaziya<br>
+    <span class="italic font-bold uppercase text-[#d4a657]">GitHub:</span> github.com/Zamam03<br>
     <span class="italic font-bold uppercase text-[#d4a657]">Location:</span> Johannesburg, South Africa<br><br>
 
     <span class="text-gray-400">Feel free to reach out for DevOps roles or collaborations!</span>

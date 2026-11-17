@@ -1,5 +1,6 @@
 
 import React from 'react';
+import Modal from './Modal';
 
 interface MatrixNotificationModalProps {
   onClose: () => void;
@@ -7,7 +8,7 @@ interface MatrixNotificationModalProps {
 
 const MatrixNotificationModal: React.FC<MatrixNotificationModalProps> = ({ onClose }) => {
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-[100] flex items-center justify-center p-4 animate-fade-in">
+    <Modal open onClose={onClose} label="Secret command unlocked" className="fixed inset-0 bg-black/80 backdrop-blur-md z-[220] flex items-center justify-center p-4 animate-fade-in">
       <div className="glass-panel-strong border-emerald-500/60 rounded-3xl shadow-[0_0_50px_rgba(16,185,129,0.25)] p-8 w-full max-w-md flex flex-col items-center relative text-center">
         <h2 className="text-emerald-400 text-2xl md:text-3xl font-extrabold font-mono tracking-wide mb-3">[SECRET UNLOCKED]</h2>
         <p className="text-[#cbd5e1] text-base leading-relaxed mb-6 bg-[#0f172a]/70 p-4 rounded-2xl border border-emerald-500/20">
@@ -20,7 +21,7 @@ const MatrixNotificationModal: React.FC<MatrixNotificationModalProps> = ({ onClo
           Got it!
         </button>
       </div>
-    </div>
+    </Modal>
   );
 };
 

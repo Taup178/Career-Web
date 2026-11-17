@@ -1,4 +1,5 @@
 
+import { readPreference, savePreference } from './portfolio';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 
 import { playEatSound, playDeathSound } from './audio';
@@ -29,7 +30,7 @@ const SnakeGame: React.FC<SnakeGameProps> = ({ stopGame, onMatrixNotification, i
   const [velocity, setVelocity] = useState({ x: 0, y: 0 });
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(() => {
-    return parseInt(localStorage.getItem('snake_highscore') || '0', 10);
+    return (Number.parseInt(readPreference('snake_highscore') || '0', 10) || 0);
   });
   const [isGameOver, setIsGameOver] = useState(false);
   const [canvasSize, setCanvasSize] = useState({ width: 600, height: 500 });
@@ -40,7 +41,7 @@ const SnakeGame: React.FC<SnakeGameProps> = ({ stopGame, onMatrixNotification, i
   useEffect(() => {
     if (score > highScore) {
       setHighScore(score);
-      localStorage.setItem('snake_highscore', score.toString());
+      savePreference('snake_highscore', score.toString());
     }
   }, [score, highScore]);
 

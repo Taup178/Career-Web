@@ -1,3 +1,4 @@
+import { readPreference, savePreference } from './portfolio';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { playEatSound, playDeathSound } from './audio';
 
@@ -69,7 +70,7 @@ const PacmanGame: React.FC<PacmanGameProps> = ({ stopGame, onMatrixNotification,
   const [isVictory, setIsVictory] = useState(false);
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(() => {
-    return parseInt(localStorage.getItem('pacman_highscore') || '0', 10);
+    return (Number.parseInt(readPreference('pacman_highscore') || '0', 10) || 0);
   });
 
   const [grid, setGrid] = useState<number[][]>(() => MAZE_GRID.map(row => [...row]));
@@ -91,7 +92,7 @@ const PacmanGame: React.FC<PacmanGameProps> = ({ stopGame, onMatrixNotification,
   useEffect(() => {
     if (score > highScore) {
       setHighScore(score);
-      localStorage.setItem('pacman_highscore', score.toString());
+      savePreference('pacman_highscore', score.toString());
     }
   }, [score, highScore]);
 

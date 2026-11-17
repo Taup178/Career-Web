@@ -1,4 +1,5 @@
 
+import { readPreference, savePreference } from './portfolio';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { playFlapSound, playDeathSound } from './audio';
 
@@ -29,7 +30,7 @@ const BirdGame: React.FC<BirdGameProps> = ({ stopGame, onMatrixNotification, isN
   const [clouds, setClouds] = useState<Cloud[]>([]);
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(() => {
-    return parseInt(localStorage.getItem('bird_highscore') || '0', 10);
+    return (Number.parseInt(readPreference('bird_highscore') || '0', 10) || 0);
   });
   const [isGameOver, setIsGameOver] = useState(false);
   const [isRunning, setIsRunning] = useState(false);
@@ -59,7 +60,7 @@ const BirdGame: React.FC<BirdGameProps> = ({ stopGame, onMatrixNotification, isN
   useEffect(() => {
     if (score > highScore) {
       setHighScore(score);
-      localStorage.setItem('bird_highscore', score.toString());
+      savePreference('bird_highscore', score.toString());
     }
   }, [score, highScore]);
 
@@ -230,18 +231,15 @@ const BirdGame: React.FC<BirdGameProps> = ({ stopGame, onMatrixNotification, isN
     ctx.fillStyle = skyGradient;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Clouds Parallax
-    setClouds(cls => cls.map(c => {
-        let newX = c.x - c.speed * scale * 0.4;
-        if (newX < -150 * scale) newX = gameDimensions.width + 150 * scale;
-        return {...c, x: newX};
-    }));
+    // Rendering must not update cloud state: doing so creates an effect loop.
     clouds.forEach(cloud => {
         ctx.fillStyle = `rgba(255, 255, 255, ${cloud.opacity * 0.4})`;
         ctx.beginPath();
         const cloudWidth = 65 * cloud.scale * scale;
         const cloudHeight = 28 * cloud.scale * scale;
-        ctx.ellipse(cloud.x + cloudWidth / 2, cloud.y, cloudWidth, cloudHeight, 0, 0, Math.PI * 2);
+        const drift = isRunning ? performance.now() * cloud.speed * scale * 0.02 : 0;
+        const x = ((cloud.x - drift) % (gameDimensions.width + 150 * scale) + gameDimensions.width + 150 * scale) % (gameDimensions.width + 150 * scale) - 75 * scale;
+        ctx.ellipse(x + cloudWidth / 2, cloud.y, cloudWidth, cloudHeight, 0, 0, Math.PI * 2);
         ctx.fill();
     });
 
@@ -368,7 +366,7 @@ const BirdGame: React.FC<BirdGameProps> = ({ stopGame, onMatrixNotification, isN
                 <div className="absolute inset-0 flex flex-col items-center justify-center z-20 bg-[#0a0c0e]/85 backdrop-blur-md rounded-3xl p-6 text-center animate-fade-in">
                     <div className="text-5xl mb-2">🐤</div>
                     <h2 className="text-[#f8fafc] text-4xl font-extrabold mb-2 tracking-wide [text-shadow:0_2px_10px_rgba(212,166,87,0.3)]">FLAPPY BIRD</h2>
-                    <p className="text-[#94a3b8] text-sm mb-6 max-w-xs">Nonavigate the matrix pipes. Score 30 points to unlock the secret terminal command!</p>
+                    <p className="text-[#94a3b8] text-sm mb-6 max-w-xs">Navigate the matrix pipes. Score 30 points to unlock the secret terminal command!</p>
                     <button 
                       onClick={(e) => { e.stopPropagation(); startGame(); }} 
                       className="px-8 py-3 text-lg rounded-2xl btn-accent font-bold cursor-pointer transform hover:scale-105 transition shadow-xl pointer-events-auto"
