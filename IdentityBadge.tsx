@@ -69,7 +69,7 @@ const IdentityBadge: React.FC = () => {
             <div className="badge-holo" />
             <div className="badge-top"><span>PERSONAL / EXPLORER PASS</span><span>ZM—024</span></div>
             <div className="badge-avatar">ZM</div>
-            <div className="badge-copy"><strong>Zamokuhle</strong><span>MAZIYA</span><small>DEVOPS · COMPUTER SCIENCE</small></div>
+            <div className="badge-copy"><strong>Zamokuhle</strong><span>MAZIYA</span><small>DEVOPS · CLOUD · SOFTWARE</small></div>
             <div className="badge-bottom"><span>AUTHORIZED TO BUILD BETTER</span><div className="badge-code" /></div>
           </div>
         </div>

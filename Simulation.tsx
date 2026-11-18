@@ -579,7 +579,7 @@ const Simulation: React.FC<{ isAnimating: boolean }> = ({ isAnimating }) => {
               <div className="flex flex-col items-start justify-center leading-none">
                 <h2 className="font-handwritten text-[1.9rem] leading-none text-[#4d2c12] [text-shadow:1px_1px_0_rgba(255,255,255,0.45)]">Zamokuhle</h2>
                 <h2 className="font-handwritten text-[1.9rem] leading-none text-[#4d2c12] [text-shadow:1px_1px_0_rgba(255,255,255,0.45)]">Maziya</h2>
-                <p className="mt-1.5 text-[0.72rem] font-semibold uppercase tracking-[0.28em] text-[#6b3f20]/95">Junior DevOps</p>
+                <p className="mt-1.5 text-[0.72rem] font-semibold uppercase tracking-[0.28em] text-[#6b3f20]/95">DevOps · Cloud · Software</p>
               </div>
             </div>
           </div>

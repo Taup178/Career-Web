@@ -51,6 +51,54 @@ section[id], article[id] { scroll-margin-top: 105px; }
 .azure-stages strong { font-size: 13px; }
 .azure-stages [aria-pressed=true] { border-color: var(--accent); color: var(--accent); background: rgba(var(--accent-rgb), .07); }
 .azure-visual > p { min-height: 80px; margin: 20px 0 0; font-size: 13px; line-height: 1.7; color: #aeb8b2; }
+.project-contribution { display: grid; gap: 8px; padding: 16px 18px; margin: 22px 0; border-left: 2px solid var(--accent); background: rgba(var(--accent-rgb), .06); }
+.project-contribution > span { font: 9px/1.5 var(--mono); letter-spacing: .08em; color: var(--accent); }
+.project-contribution > strong { font-size: 14px; line-height: 1.7; font-weight: 500; color: #e0e8e2; }
+
+/* A compact concept preview of the team's planning app. */
+.logbook-visual { width: 100%; max-width: 720px; min-width: 0; margin: auto; border: 1px solid #ffffff24; border-radius: 14px; background: #efe8de; color: #332b26; box-shadow: 0 24px 60px #0003; overflow: hidden; }
+.logbook-window { display: flex; align-items: center; gap: 16px; min-height: 42px; padding: 12px 18px; background: #26231f; color: #c0b4a4; }
+.logbook-window > span { display: flex; gap: 5px; }
+.logbook-window i { width: 6px; height: 6px; border-radius: 50%; background: #8a7763; }
+.logbook-window i:first-child { background: #c88b75; }
+.logbook-window i:nth-child(2) { background: #ceb17e; }
+.logbook-window small { font: 9px/1.5 var(--mono); overflow-wrap: anywhere; }
+.logbook-canvas { padding: clamp(18px, 2.2vw, 28px); }
+.logbook-heading > span { font: 9px/1.6 var(--mono); color: #715c49; letter-spacing: .06em; }
+.logbook-heading > strong { display: block; margin: 12px 0 8px; font-size: clamp(24px, 2.4vw, 34px); line-height: 1.1; letter-spacing: -.04em; }
+.logbook-heading p { font-size: 12px; line-height: 1.7; color: #766657; }
+.logbook-view-switch { display: flex; gap: 5px; padding: 4px; margin: 22px 0; border: 1px solid #c4b7a5; border-radius: 9px; background: #e3d9cb; }
+.logbook-view-switch button { flex: 1; min-height: 40px; padding: 8px 4px; border-radius: 6px; font-size: 11px; color: #62513f; }
+.logbook-view-switch [aria-pressed=true] { background: #fffaf3; color: #382b20; box-shadow: 0 2px 7px #50381e14; font-weight: 600; }
+.logbook-visual :focus-visible { outline-color: #70553c; outline-offset: 2px; }
+.logbook-demo { min-height: 195px; }
+.logbook-board { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.logbook-column { min-width: 0; }
+.logbook-column-title { display: flex; align-items: baseline; gap: 5px; min-height: 34px; font-size: 10px; line-height: 1.6; color: #6b5744; }
+.logbook-column-title > i { width: 5px; height: 5px; flex-shrink: 0; border-radius: 50%; background: #ad987a; }
+.logbook-column:nth-child(2) .logbook-column-title > i { background: #bb7b54; }
+.logbook-column:nth-child(3) .logbook-column-title > i { background: #679071; }
+.logbook-entry { display: flex; flex-direction: column; gap: 10px; min-height: 148px; padding: 14px 11px; border: 1px solid #d5c8b7; border-radius: 9px; background: #fffaf3; box-shadow: 0 4px 10px #50381e08; }
+.logbook-entry > span { font: 9px var(--mono); color: #93765b; }
+.logbook-entry strong { font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
+.logbook-entry small { font-size: 10px; line-height: 1.6; color: #766657; }
+.logbook-entry > i { width: 24px; height: 3px; border-radius: 3px; background: #bca382; margin-top: auto; }
+.logbook-calendar { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); min-height: 182px; border: 1px solid #cdbfae; border-radius: 8px; overflow: hidden; background: #fffaf3; }
+.logbook-calendar > div { min-width: 0; padding: 12px 6px; border-right: 1px solid #ded3c5; }
+.logbook-calendar > div:last-child { border: 0; }
+.logbook-calendar span { display: block; font-size: 10px; color: #766657; }
+.logbook-calendar strong { display: block; margin: 8px 0 18px; font: 16px var(--mono); }
+.logbook-calendar small { display: block; padding: 7px 5px; border-radius: 4px; background: #e7d8c2; color: #624a34; font-size: 10px; line-height: 1.6; overflow-wrap: anywhere; }
+.logbook-timeline { display: grid; gap: 18px; padding: 22px 0; }
+.logbook-timeline > div { display: grid; grid-template-columns: 82px minmax(0, 1fr); align-items: center; gap: 12px; }
+.logbook-timeline span { font-size: 11px; }
+.logbook-timeline > div > div { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); padding-block: 6px; border-bottom: 1px dashed #bdac96; }
+.logbook-timeline i { height: 18px; border-radius: 5px; background: #a58a65; }
+.logbook-timeline > div:nth-child(2) i { background: #b9805b; }
+.logbook-timeline > div:nth-child(3) i { background: #708d74; }
+.logbook-system { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px; padding-top: 20px; margin-top: 14px; border-top: 1px solid #cdbfae; font: 8px/1.7 var(--mono); color: #66513f; }
+.logbook-system i { font-style: normal; color: #93765b; }
+.logbook-preview-note { margin: 12px 0 0; font: 9px/1.6 var(--mono); color: #766657; }
 .timeline small { font-size: 9px; line-height: 1.6; }
 .timeline p { font-size: 12px; line-height: 1.7; }
 .timeline > div > span { font-size: 8px; }
@@ -278,7 +326,7 @@ footer { font-size: 9px; }
 .workspace-header .view-switch { gap: 4px; }
 .menu-trigger { width: auto; min-height: 44px; padding: 8px; font: 12px var(--mono); }
 .hero-actions .text-button { min-height: 48px; }
-.project-jump-links { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: -15px 0 36px; }
+.project-jump-links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: -15px 0 36px; }
 .project-jump-links a { display: flex; align-items: center; gap: 12px; padding: 17px 16px; border: 1px solid #17231c33; border-radius: 8px; font-size: 13px; color: var(--ink); background: #ffffff40; text-decoration: none; }
 .project-jump-links a span { font: 10px var(--mono); color: #4c5c50; }
 .project-jump-links a span:last-child { margin-left: auto; }
@@ -319,6 +367,16 @@ footer { font-size: 9px; }
   .main-nav { top: 72px; max-height: calc(100dvh - 72px); }
   .project-jump-links { grid-template-columns: 1fr; gap: 8px; margin-top: 0; }
   .project-jump-links a { min-height: 52px; }
+}
+@media (max-width: 580px) {
+  .logbook-board { grid-template-columns: 1fr; gap: 12px; }
+  .logbook-column { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 8px; }
+  .logbook-column-title { padding-top: 12px; }
+  .logbook-entry { min-height: 86px; padding: 12px; gap: 6px; }
+  .logbook-entry > span, .logbook-entry > i { display: none; }
+  .logbook-demo { min-height: 0; }
+  .logbook-calendar { min-height: 210px; }
+  .logbook-timeline { padding-block: 20px 36px; }
 }
 @media (max-width: 640px) {
   .topbar { display: grid; grid-template-columns: minmax(0, 1fr) 96px auto; grid-template-rows: 40px 48px; height: 104px; padding: 8px 16px; gap: 0 8px; }

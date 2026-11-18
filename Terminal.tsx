@@ -95,10 +95,11 @@ export default function Terminal({ onCommand, isMatrixCommandUnlocked, active, t
           <article key={project.id}>
             <small>{project.category}</small><h3>{project.title}</h3>
             <p>{project.description}</p><p className="term-tip">{project.tools.join(' · ')}</p>
+            {'contribution' in project && <p><b>My contribution:</b> {project.contribution}</p>}
             <div className="term-project-actions">
               <button onClick={() => run('open ' + project.id)}>Visual preview ↗</button>
               <a href={project.source} target="_blank" rel="noreferrer">Source ↗</a>
-              {'live' in project && <a href={project.live} target="_blank" rel="noreferrer">Play game ↗</a>}
+              {'live' in project && <a href={project.live} target="_blank" rel="noreferrer">{project.liveLabel} ↗</a>}
             </div>
           </article>
         )}
@@ -106,10 +107,10 @@ export default function Terminal({ onCommand, isMatrixCommandUnlocked, active, t
     }
     if (result.view === 'profile') {
       const content: Record<string, string> = {
-        about: profile.name + '\nComputer Science finalist · Junior DevOps builder\n' + profile.location,
+        about: profile.name + '\nComputer Science finalist · DevOps & Cloud focus\n' + profile.location + '\n\n' + profile.careerFocus,
         education: 'BSc Computer Science — University of the Witwatersrand\nFinal-year student\n\nNational Senior Certificate — Njeyeza Secondary School\nMatriculated with distinction',
         skills: 'Languages   Python · Java · C++ · JavaScript · SQL\nCloud       Azure · Firebase · Render\nContainers  Docker · Compose · Kubernetes\nIaC         Terraform · Kubernetes YAML\nDelivery    GitHub Actions · Azure DevOps\nTools       Git · GitHub · Linux · Windows',
-        contact: profile.email + '\n' + profile.location,
+        contact: profile.email + '\n' + profile.location + '\n\n' + profile.careerFocus,
       };
       return <div className="term-card"><pre>{content[result.subject || 'about']}</pre>
         {result.subject === 'contact' && <div className="term-project-actions"><a href={'mailto:' + profile.email}>Email ↗</a><a href={profile.linkedin} target="_blank" rel="noreferrer">LinkedIn ↗</a><a href={profile.github} target="_blank" rel="noreferrer">GitHub ↗</a></div>}

@@ -13,8 +13,9 @@ export type ShellResult = {
 
 export const manuals: Record<string, { title: string; commands: [string, string][] }> = {
   nav: { title: 'Find your way', commands: [
-    ['home', 'Return to the opening scene'], ['open work', 'Browse all three projects'],
-    ['open stockvel', 'Explore the microservices map'], ['open azure', 'Inspect the cloud learning lab'],
+    ['home', 'Return to the opening scene'], ['open work', 'Browse the selected projects'],
+    ['open stockvel', 'Explore the microservices map'], ['open devops', 'Explore infrastructure, containers and CI/CD practices'],
+    ['open logbook', 'Explore Digital Logbook and my team contribution'],
     ['open thesis', 'Inspect Thesis of the Dead'], ['open about', 'Education and background'],
     ['open stack', 'Technical capabilities'], ['open contact', 'Email and social links'],
     ['cd ../', 'Explore the virtual project folders'],
@@ -68,7 +69,7 @@ export function runShell(raw: string, state: ShellState): ShellResult {
   const input = raw.trim();
   const lower = input.toLowerCase().replace(/\s+/g, ' ');
   const tokens = lower.split(' ');
-  const alias: Record<string, string> = { projects: 'get projects', skills: 'get skills', contact: 'get contact', education: 'get education', cls: 'clear', 'hire me': 'brief', 'sudo hire zamokuhle': 'brief', 'open projects': 'open work', 'cd work': 'open work', 'cd stack': 'open stack', 'cd about': 'open about', 'cd play': 'open play', 'cd contact': 'open contact' };
+  const alias: Record<string, string> = { projects: 'get projects', skills: 'get skills', contact: 'get contact', education: 'get education', cls: 'clear', 'hire me': 'brief', 'sudo hire zamokuhle': 'brief', 'open projects': 'open work', 'open devops': 'open azure', 'cd work': 'open work', 'cd stack': 'open stack', 'cd about': 'open about', 'cd play': 'open play', 'cd contact': 'open contact' };
   if (Object.hasOwn(alias, lower)) return runShell(alias[lower], state);
   if (lower === 'clear') return { clear: true };
   if (lower === 'exit' || lower === 'logout') return { action: 'exit' };

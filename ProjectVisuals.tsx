@@ -21,16 +21,16 @@ export function StockvelVisual() {
   </div>;
 }
 
-export function AzureVisual() {
+export function DevOpsVisual() {
   const [step, setStep] = useState(0);
   const stages = [
-    ['01', 'BUILD', 'Docker image', 'Package the application and its dependencies into a reusable container image.'],
-    ['02', 'STORE', 'Azure registry', 'Push the image to Azure Container Registry so it can be used by the deployment.'],
-    ['03', 'DECLARE', 'Kubernetes', 'Describe the workload with Kubernetes deployment and service manifests.'],
-    ['04', 'RECONCILE', 'ArgoCD', 'Explore how a GitOps controller reconciles the cluster with the declared state in Git.'],
+    ['01', 'PROVISION', 'Infrastructure as code', 'Terraform modules and matching ARM templates define Azure infrastructure, including resources for the voting application.'],
+    ['02', 'PACKAGE', 'Containers & Compose', 'Dockerfiles and Compose definitions connect a voting app with Python, Node.js and .NET services, Redis and PostgreSQL.'],
+    ['03', 'AUTOMATE', 'CI/CD workflows', 'The deployment guide documents Azure Repos and a multi-stage Azure DevOps pipeline that builds images, pushes to ACR and updates Git manifests.'],
+    ['04', 'DEPLOY', 'Kubernetes & GitOps', 'Kubernetes examples cover deployments, services, configuration and ingress. The guide explains AKS setup and ArgoCD synchronization.'],
   ];
   return <div className="azure-visual">
-    <div className="arch-top"><span>AZURE / GITOPS LAB</span><span>LEARNING MAP</span></div>
+    <div className="arch-top"><span>DEVOPS PRACTICES</span><span>PRACTICE MAP</span></div>
     <div className="azure-orbit" aria-hidden="true"><i /><i /><span>△</span></div>
     <div className="azure-stages">{stages.map(([number, label, title], index) => <button key={label} onClick={() => setStep(index)} aria-pressed={step === index}><small>{number} / {label}</small><strong>{title}</strong></button>)}</div>
     <p aria-live="polite">{stages[step][3]}</p>

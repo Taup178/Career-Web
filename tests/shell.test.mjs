@@ -32,6 +32,7 @@ test('completion understands current paths and preserves project filename case',
   assert.deepEqual(completeCommand('cd Th', HOME), ['cd Thesis_of_the_dead']);
   assert.deepEqual(completeCommand('cat pack', HOME + '/Thesis_of_the_dead'), ['cat package.json']);
   assert.deepEqual(completeCommand('theme n', ROOT), ['theme nebula']);
+  assert.deepEqual(completeCommand('open log', ROOT), ['open logbook']);
 });
 
 test('echo and history preserve literal input including markup', () => {

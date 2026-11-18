@@ -8,7 +8,8 @@ import MatrixOverlay from './MatrixOverlay';
 import MatrixNotificationModal from './MatrixNotificationModal';
 import IdentityBadge from './IdentityBadge';
 import ThesisProjectVisual from './ThesisProjectVisual';
-import { StockvelVisual, AzureVisual } from './ProjectVisuals';
+import DigitalLogbookVisual from './DigitalLogbookVisual';
+import { StockvelVisual, DevOpsVisual } from './ProjectVisuals';
 import Modal from './Modal';
 import ViewSwitch from './ViewSwitch';
 import ThemePicker from './ThemePicker';
@@ -25,6 +26,15 @@ const sections = [
   { id: 'playground', label: 'Arcade' },
   { id: 'contact', label: 'Contact' },
 ];
+
+const devopsProject = projects.find(project => project.id === 'azure')!;
+const logbookProject = projects.find(project => project.id === 'logbook')!;
+const projectVisuals: Record<ProjectId, React.ComponentType> = {
+  stockvel: StockvelVisual,
+  azure: DevOpsVisual,
+  logbook: DigitalLogbookVisual,
+  thesis: ThesisProjectVisual,
+};
 
 const foundationTools = ['Python', 'Java', 'C++', 'SQL', 'Node.js', 'Firebase'];
 
@@ -78,6 +88,8 @@ const App: React.FC = () => {
   const [showMatrixNotification, setShowMatrixNotification] = useState(false);
   const [matrixUnlocked, setMatrixUnlocked] = useState(() => readPreference('zm-matrix') === 'unlocked');
   const [activeSection, setActiveSection] = useState('home');
+  const selectedProject = projects.find(project => project.id === preview)!;
+  const SelectedProjectVisual = projectVisuals[preview];
 
   const changeView = useCallback((view: 'portfolio' | 'terminal') => {
     setMenuOpen(false);
@@ -154,9 +166,8 @@ const App: React.FC = () => {
     if (command.startsWith('stop ')) setGameState(GameState.None);
     if (command === 'hire me') setShowHireMe(true);
     if (command === 'matrix' && matrixUnlocked) setShowMatrix(true);
-    if (command === 'open thesis') { setPreview('thesis'); setMobilePreview(true); }
-    if (command === 'open stockvel') { setPreview('stockvel'); setMobilePreview(true); }
-    if (command === 'open azure') { setPreview('azure'); setMobilePreview(true); }
+    const project = projects.find(project => command === 'open ' + project.id);
+    if (project) { setPreview(project.id); setMobilePreview(true); }
     if (command === 'motion off') setMotion(false);
     if (command === 'motion on') setMotion(true);
     if (command === 'unlock') { setMatrixUnlocked(true); savePreference('zm-matrix', 'unlocked'); }
@@ -201,7 +212,7 @@ const App: React.FC = () => {
       <header className="topbar">
         <button className="brand" onClick={() => goTo('home')} aria-label="Go to top">
           <span className="brand-mark">ZM</span>
-          <span className="brand-copy"><strong>Zamokuhle Maziya</strong><small>DevOps · Johannesburg</small></span>
+          <span className="brand-copy"><strong>Zamokuhle Maziya</strong><small>DevOps · Cloud · Software</small></span>
         </button>
 
         <nav id="main-navigation" className={`main-nav ${menuOpen ? 'is-open' : ''}`} aria-label="Main navigation">
@@ -222,9 +233,9 @@ const App: React.FC = () => {
       <main>
         <section id="home" className="hero section-pad">
           <div className="hero-copy reveal">
-            <div className="eyebrow"><span className="status-dot" /> Open to junior DevOps opportunities</div>
+            <div className="eyebrow"><span className="status-dot" /> Open to junior &amp; graduate roles</div>
             <h1>I turn fragile releases into <em>calm, repeatable systems.</em></h1>
-            <p className="hero-intro">Computer Science finalist and hands-on DevOps builder working across cloud, containers, infrastructure and delivery automation.</p>
+            <p className="hero-intro">Computer Science finalist building practical experience in cloud, automation and software development. {profile.careerFocus}</p>
             <div className="hero-actions">
               <button className="primary-button" onClick={() => goTo('work')}>View projects <ArrowIcon /></button>
               <button className="text-button" onClick={() => changeView('terminal')}><span aria-hidden="true">&gt;_</span> Open terminal</button>
@@ -272,7 +283,7 @@ const App: React.FC = () => {
             <figcaption>
               <span>BEHIND THE SYSTEMS</span>
               <strong>{profile.name}</strong>
-              <p>DevOps builder · Johannesburg</p>
+              <p>DevOps &amp; Cloud · Johannesburg</p>
             </figcaption>
           </figure>
           <div className="section-heading">
@@ -298,19 +309,35 @@ const App: React.FC = () => {
           </article>
 
           <article id="azure-project" className="project-feature azure-feature">
-            <AzureVisual />
-            <div className="project-copy"><span className="project-index">02 — CONTINUOUS LEARNING</span><h3>Azure &amp;<br />GitOps Lab</h3>
-              <p className="project-lead">Following the journey from a Docker image to a declared, repeatable Kubernetes deployment.</p>
-              <p className="project-detail">A practical exploration of Azure Container Registry, Kubernetes manifests and GitOps workflows with ArgoCD. Select a stage in the map to inspect the process.</p>
-              <div className="tool-ribbon">{projects.find(project => project.id === 'azure')!.tools.map(tool => <span key={tool}>{tool}</span>)}</div>
-              <a className="project-link" href={projects.find(project => project.id === 'azure')!.source} target="_blank" rel="noreferrer">Explore the lab <ExternalIcon /></a>
+            <DevOpsVisual />
+            <div className="project-copy"><span className="project-index">02 — INFRASTRUCTURE &amp; DELIVERY</span><h3>{devopsProject.title}</h3>
+              <p className="project-lead">{devopsProject.description}</p>
+              <p className="project-detail">Includes a multi-service voting app, Terraform and ARM templates, Kubernetes manifests, and an Azure DevOps → ACR → ArgoCD deployment guide. Select a practice in the map to explore it.</p>
+              <div className="tool-ribbon">{devopsProject.tools.map(tool => <span key={tool}>{tool}</span>)}</div>
+              <a className="project-link" href={devopsProject.source} target="_blank" rel="noreferrer">Explore the practices <ExternalIcon /></a>
+            </div>
+          </article>
+
+          <article id="logbook-project" className="project-feature logbook-feature">
+            <DigitalLogbookVisual />
+            <div className="project-copy">
+              <span className="project-index">03 — TEAM PROJECT / PLANNING PLATFORM</span>
+              <h3>{logbookProject.title}</h3>
+              <p className="project-lead">{logbookProject.description}</p>
+              <div className="project-contribution"><span>MY CONTRIBUTION</span><strong>{logbookProject.contribution}</strong></div>
+              <p className="project-detail">The platform brings a React client, API gateway and dedicated authentication, dashboard, project and profile services together with Supabase. My work focused on architecture planning, containerizing the system with Docker and Compose, and deployments to Render.</p>
+              <div className="project-actions">
+                <a className="project-link play-link" href={logbookProject.live} target="_blank" rel="noreferrer">{logbookProject.liveLabel} <ArrowIcon /></a>
+                <a className="project-link" href={logbookProject.source} target="_blank" rel="noreferrer">View source <ExternalIcon /></a>
+              </div>
+              <div className="tool-ribbon">{logbookProject.tools.map(tool => <span key={tool}>{tool}</span>)}</div>
             </div>
           </article>
 
           <article id="thesis-project" className="project-feature thesis-feature">
             <ThesisProjectVisual />
             <div className="project-copy">
-              <span className="project-index">03 — INTERACTIVE 3D GAME</span>
+              <span className="project-index">04 — INTERACTIVE 3D GAME / TEAM PROJECT</span>
               <h3>Thesis of<br />the Dead</h3>
               <p className="project-lead">A team-built browser survival game where a student fights through the zombie-infested landscape of their degree—from the Freshman Woods to a final showdown with the Dean.</p>
               <div className="project-facts">
@@ -355,11 +382,11 @@ const App: React.FC = () => {
         <section id="about" className="about-section section-pad">
           <div className="about-statement"><span className="section-number">04 / ABOUT</span><blockquote>Turning a messy process into a <em>system people can trust.</em></blockquote></div>
           <div className="about-grid">
-            <div className="about-copy"><p>I’m Zamokuhle, a final-year Computer Science student at the University of the Witwatersrand, based in Johannesburg.</p><p>My focus is DevOps because it sits at the intersection I enjoy most: software, infrastructure, problem-solving and the people who need all three to work together.</p><button className="text-button" onClick={() => setShowHireMe(true)}>Why I’m a strong teammate <ArrowIcon /></button></div>
+            <div className="about-copy"><p>I’m Zamokuhle, a final-year Computer Science student at the University of the Witwatersrand, based in Johannesburg.</p><p>{profile.careerFocus} I enjoy connecting software, infrastructure and automation to build useful, reliable systems.</p><button className="text-button" onClick={() => setShowHireMe(true)}>Why I’m a strong teammate <ArrowIcon /></button></div>
             <div className="timeline">
               <div><span>NOW</span><i /><section><small>UNIVERSITY OF THE WITWATERSRAND</small><strong>BSc Computer Science</strong><p>Final-year student · Johannesburg</p></section></div>
               <div><span>FOUNDATION</span><i /><section><small>NJEYEZA SECONDARY SCHOOL</small><strong>National Senior Certificate</strong><p>Matriculated with distinction</p></section></div>
-              <div><span>NEXT</span><i /><section><small>THE MISSION</small><strong>Junior DevOps opportunity</strong><p>A team where I can contribute, learn quickly and ship reliable systems.</p></section></div>
+              <div><span>NEXT</span><i /><section><small>THE MISSION</small><strong>DevOps &amp; Cloud focus</strong><p>Also open to junior and graduate software engineering roles.</p></section></div>
             </div>
           </div>
         </section>
@@ -377,7 +404,7 @@ const App: React.FC = () => {
           <div className="contact-orbit"><span>AVAILABLE</span><i>✦</i><span>JOHANNESBURG</span><i>✦</i></div>
           <span className="section-number">06 / LET’S CONNECT</span><h2>Have a system to improve<br />or a team to grow?</h2>
           <a className="contact-email" href="mailto:zamokuhlemaziya944@gmail.com">zamokuhlemaziya944@gmail.com <ArrowIcon /></a>
-          <div className="contact-bottom"><p>Open to junior DevOps roles, graduate opportunities and thoughtful collaborations.</p><div className="social-links"><a href="https://linkedin.com/in/zamokuhle-maziya" target="_blank" rel="noreferrer">LinkedIn <span>↗</span></a><a href={profile.github} target="_blank" rel="noreferrer">GitHub <span>↗</span></a></div></div>
+          <div className="contact-bottom"><p>{profile.careerFocus} Junior and graduate opportunities welcome.</p><div className="social-links"><a href="https://linkedin.com/in/zamokuhle-maziya" target="_blank" rel="noreferrer">LinkedIn <span>↗</span></a><a href={profile.github} target="_blank" rel="noreferrer">GitHub <span>↗</span></a></div></div>
         </section>
       </main>
 
@@ -396,10 +423,11 @@ const App: React.FC = () => {
           <div className="workspace-mobile-tabs" role="group" aria-label="Terminal workspace panel"><button onClick={() => setMobilePreview(false)} aria-pressed={!mobilePreview}>Command line</button><button onClick={() => setMobilePreview(true)} aria-pressed={mobilePreview}>Project visuals</button></div>
           <section className={'command-preview ' + (mobilePreview ? 'mobile-active' : '')} aria-label="Project visual display">
             <nav className="preview-tabs" aria-label="Choose a project">{projects.map(project => <button key={project.id} onClick={() => setPreview(project.id)} aria-pressed={preview === project.id}>{project.title}</button>)}</nav>
-            <div className="preview-stage">{terminalOpen && (preview === 'thesis' ? <ThesisProjectVisual /> : preview === 'stockvel' ? <StockvelVisual /> : <AzureVisual />)}</div>
-            <div className="preview-description"><small>{projects.find(project => project.id === preview)!.category}</small><h2>{projects.find(project => project.id === preview)!.title}</h2><p>{projects.find(project => project.id === preview)!.description}</p>
-              <div className="tool-ribbon">{projects.find(project => project.id === preview)!.tools.map(tool => <span key={tool}>{tool}</span>)}</div>
-              <div className="project-actions"><a className="project-link" href={projects.find(project => project.id === preview)!.source} target="_blank" rel="noreferrer">View source ↗</a>{preview === 'thesis' && <a className="project-link" href={projects.find(project => project.id === 'thesis')!.live} target="_blank" rel="noreferrer">Play live ↗</a>}</div>
+            <div className="preview-stage">{terminalOpen && <SelectedProjectVisual />}</div>
+            <div className="preview-description"><small>{selectedProject.category}</small><h2>{selectedProject.title}</h2><p>{selectedProject.description}</p>
+              {'contribution' in selectedProject && <div className="project-contribution"><span>MY CONTRIBUTION</span><strong>{selectedProject.contribution}</strong></div>}
+              <div className="tool-ribbon">{selectedProject.tools.map(tool => <span key={tool}>{tool}</span>)}</div>
+              <div className="project-actions"><a className="project-link" href={selectedProject.source} target="_blank" rel="noreferrer">View source ↗</a>{'live' in selectedProject && <a className="project-link" href={selectedProject.live} target="_blank" rel="noreferrer">{selectedProject.liveLabel} ↗</a>}</div>
             </div>
           </section>
           <div className={'workspace-terminal ' + (!mobilePreview ? 'mobile-active' : '')}>

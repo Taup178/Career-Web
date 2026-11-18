@@ -30,7 +30,7 @@ The build produces a static site in `dist/`. Tailwind utilities are compiled loc
 - The footer **Appearance** panel closes when you select an option, click outside, move focus away, press Escape, click its close button, or toggle the heading again.
 - Open the 30-second recruiter brief from the hero.
 - Open the terminal using the view switch, hero button or Ctrl/⌘+K. Return with **Portfolio** or Escape. On desktop, projects appear to the left of the terminal. On small screens, use the Command line / Project visuals buttons; reopening always shows the command line.
-- Project jump links lead to Stockvel-Pro, Azure & GitOps Lab, then Thesis of the Dead. This order is shared by the portfolio, terminal and recruiter brief.
+- Project jump links lead to Stockvel-Pro, DevOps Practices, Digital Logbook, then Thesis of the Dead. This order is shared by the portfolio, terminal and recruiter brief.
 - `get` commands display details inside the terminal; `open work`, `open stack`, `open about`, `open contact` and `open play` take you to the corresponding portfolio section.
 - Select chapters in the Thesis illustration, services in the Stockvel diagram, or stages in the Azure flow.
 
@@ -42,6 +42,8 @@ help system           # Shell utilities
 help arcade           # Games and records
 help themes           # Atmosphere and motion controls
 open thesis           # Visual project display
+open devops           # Infrastructure, containers, CI/CD and GitOps practices
+open logbook          # Team planning app, visuals and my contribution
 play thesis           # Direct link to the hosted game
 cd ../
 ls
@@ -55,6 +57,10 @@ Use ↑/↓ for history, Tab for contextual completion, Ctrl+L to clear and Ctrl
 ## Content and visuals
 
 `portfolio.ts` contains shared project links, tools and contact details. Thesis of the Dead is credited as a team project. Its tools were checked against the sibling source checkout's package manifest, shaders, loaders, audio and test code. The hosted play URL is https://wmc.ms.wits.ac.za/students/sgroup3911/index.html and source is https://github.com/Taup178/Thesis_of_the_dead.
+
+DevOps Practices links to https://github.com/Zamam03/Microsoft-Azure. Its summary and practice map reflect the repository's Terraform and ARM templates, Docker/Compose voting app, Kubernetes examples and documented Azure DevOps/ACR/ArgoCD workflow. `open azure` remains available alongside `open devops`.
+
+Digital Logbook is the third project and is credited as a team project. My contribution was architecture planning, containerization and deployments. Its repository is https://github.com/logb945/Digital-Logbook and its hosted frontend is https://digital-logbook-dhtq.onrender.com. Tools and architecture were checked against the README, frontend and API gateway package manifests, Dockerfiles and repository tree. The Kanban, calendar and timeline display is an illustrative preview with sample entries, separate from the live app.
 
 The chapter scenes are CSS illustrations, labelled accordingly; they are not screenshots or an embedded copy of the full game. The hero deployment board is a labelled simulation. `status` reports local browser values, not external service health.
 

@@ -36,13 +36,13 @@ export const terminalResponses: { [key: string]: string } = {
     • Implemented environment-based configuration management and health checks to improve deployment reliability.<br>
     <span class="italic font-bold uppercase text-[#d4a657]">Technologies:</span> Node.js, Express, React, Firebase, Docker, Docker Compose, Kubernetes, GitHub Actions, Render.<br><br>
 
-    <span class="italic font-bold uppercase text-[#d4a657]">DevOps Principles (Continuous Learning)</span>
+    <span class="italic font-bold uppercase text-[#d4a657]">DevOps Practices</span>
     <a href="https://github.com/Zamam03/Microsoft-Azure" target="_blank" class="text-[#d4a657] hover:underline ml-2">[GitHub]</a><br>
-    • Built Docker images for containerized applications.<br>
-    • Stored container images in Azure Container Registry (ACR).<br>
-    • Deployed applications using Kubernetes manifests.<br>
-    • Explored GitOps deployment workflows using ArgoCD.<br>
-    <span class="italic font-bold uppercase text-[#d4a657]">Technologies:</span> Azure, Docker, Kubernetes, Azure Container Registry, ArgoCD.
+    • Practised infrastructure as code with Terraform modules and ARM templates.<br>
+    • Built Docker and Compose examples, including a multi-service voting application.<br>
+    • Created Kubernetes deployment, service, configuration and ingress examples.<br>
+    • Documented CI/CD with Azure DevOps, Azure Container Registry and ArgoCD.<br>
+    <span class="italic font-bold uppercase text-[#d4a657]">Technologies:</span> Azure, Terraform, ARM templates, Docker, Docker Compose, Azure DevOps, ACR, Kubernetes / AKS, ArgoCD.
   `,
   'get contact': `
     <span class="px-3 py-1 text-sm font-bold uppercase tracking-wider rounded bg-[#d4a657]/30 text-[#d4a657] border border-[#d4a657]/50 inline-block">CONTACT INFORMATION</span><br>
@@ -52,7 +52,7 @@ export const terminalResponses: { [key: string]: string } = {
     <span class="italic font-bold uppercase text-[#d4a657]">GitHub:</span> github.com/Zamam03<br>
     <span class="italic font-bold uppercase text-[#d4a657]">Location:</span> Johannesburg, South Africa<br><br>
 
-    <span class="text-gray-400">Feel free to reach out for DevOps roles or collaborations!</span>
+    <span class="text-gray-400">Focused on DevOps and Cloud roles, and open to other software engineering opportunities and collaborations.</span>
   `,
   'help': `
     <span class="px-3 py-1 text-sm font-bold uppercase tracking-wider rounded bg-[#d4a657]/30 text-[#d4a657] border border-[#d4a657]/50 inline-block">AVAILABLE COMMANDS</span><br>
