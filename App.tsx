@@ -74,7 +74,7 @@ const ExternalIcon = () => (
 );
 
 const App: React.FC = () => {
-  const [theme, setTheme] = useState<Theme>(() => { const saved = readPreference('zm-theme'); return isTheme(saved) ? saved : 'orbit'; });
+  const [theme, setTheme] = useState<Theme>(() => { const saved = readPreference('zm-theme'); return isTheme(saved) ? saved : 'solar'; });
   const [motion, setMotion] = useState(() => readPreference('zm-motion') !== 'off');
   const [preview, setPreview] = useState<ProjectId>('stockvel');
   const [mobilePreview, setMobilePreview] = useState(false);

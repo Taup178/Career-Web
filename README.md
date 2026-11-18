@@ -25,7 +25,7 @@ The build produces a static site in `dist/`. Tailwind utilities are compiled loc
 ## Explore
 
 - The fixed header keeps **Portfolio / Terminal** visible, including on phones. Switching back preserves your page position and terminal session.
-- The labelled **Theme** selector in both view headers switches between Orbit, Nebula and Solar, including on phones. **Appearance** in the footer also offers the themes and animation pause control. Both preferences persist locally, and reduced-motion system preferences are respected.
+- Solar is the default theme for visitors without a saved choice. The labelled **Theme** selector in both view headers switches between Orbit, Nebula and Solar, including on phones. **Appearance** in the footer also offers the themes and animation pause control. Both preferences persist locally, and reduced-motion system preferences are respected.
 - The identity badge swings gently with its lanyard. Pause or resume it with the animation control in **Appearance**; reduced-motion preferences are respected. Drag the badge, or focus it and use arrow keys. Enter resets it.
 - The footer **Appearance** panel closes when you select an option, click outside, move focus away, press Escape, click its close button, or toggle the heading again.
 - Open the 30-second recruiter brief from the hero.
