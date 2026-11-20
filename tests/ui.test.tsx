@@ -15,7 +15,12 @@ test('portfolio navigation, project workspace, themes and shell interactions', a
   let scrolledTo = '';
   window.HTMLElement.prototype.scrollIntoView = function () { scrolledTo = this.id; };
   window.HTMLElement.prototype.getClientRects = function () { return this.closest('[hidden]') ? [] as any : [{ width: 200, height: 60 }] as any; };
-  Object.defineProperty(globalThis, 'IntersectionObserver', { configurable: true, value: class { observe() {} disconnect() {} } });
+  const observed = new Map<Element, IntersectionObserverCallback>();
+  Object.defineProperty(globalThis, 'IntersectionObserver', { configurable: true, value: class {
+    constructor(private callback: IntersectionObserverCallback) {}
+    observe(element: Element) { observed.set(element, this.callback); }
+    disconnect() {}
+  } });
   Object.defineProperty(globalThis, 'ResizeObserver', { configurable: true, value: class { callback: Function; constructor(callback: Function) { this.callback = callback; } observe() { this.callback([{ contentRect: { width: 600, height: 600 } }]); } disconnect() {} } });
   Object.defineProperty(globalThis, 'requestAnimationFrame', { configurable: true, value: () => 1 });
   Object.defineProperty(globalThis, 'cancelAnimationFrame', { configurable: true, value: () => {} });
@@ -49,17 +54,49 @@ test('portfolio navigation, project workspace, themes and shell interactions', a
     await act(async () => { window.document.querySelector('#shell-input')!.dispatchEvent(new window.KeyboardEvent('keydown', { key, bubbles: true, ...extras })); });
   };
   try {
+    window.localStorage.setItem('zm-theme', 'orbit');
     await act(async () => { root.render(<App />); });
+    assert.ok(document.querySelector('.site-shell.theme-solar'), 'the legacy saved Orbit default migrates to Solar');
+    assert.equal(document.querySelector<HTMLSelectElement>('.topbar .theme-picker select')!.value, 'solar');
+    assert.equal(window.localStorage.getItem('zm-theme'), 'solar');
     assert.equal(window.document.querySelectorAll('main section[id]').length, 6);
     assert.deepEqual(Array.from(document.querySelectorAll('#work article')).map(element => element.id), ['stockvel-project', 'azure-project', 'logbook-project', 'thesis-project']);
     assert.deepEqual(Array.from(document.querySelectorAll('.project-jump-links a')).map(element => element.getAttribute('href')), ['#stockvel-project', '#azure-project', '#logbook-project', '#thesis-project']);
     assert.match(document.querySelector('#logbook-project .project-index')!.textContent!, /^03/);
     assert.match(document.querySelector('#thesis-project .project-index')!.textContent!, /^04/);
     assert.match(document.querySelector('#logbook-project .project-contribution')!.textContent!, /Architecture planning, containerization and deployments/);
+    const stockvel = document.querySelector<HTMLElement>('#stockvel-project .project-preview')!;
+    await click(stockvel.querySelector('.system-services button:nth-child(2)'));
+    assert.equal(stockvel.querySelector('.system-services [aria-pressed=true]')!.textContent, 'Payments');
+    assert.match(stockvel.querySelector('.preview-inspector')!.textContent!, /\/payments.*Payment workflows/);
+    const observeStockvel = (isIntersecting: boolean) => observed.get(stockvel)!([{
+      target: stockvel, isIntersecting, intersectionRatio: isIntersecting ? 1 : 0,
+      boundingClientRect: stockvel.getBoundingClientRect(), intersectionRect: stockvel.getBoundingClientRect(), rootBounds: null, time: 0,
+    }], {} as IntersectionObserver);
+    await act(async () => { observeStockvel(false); });
+    assert.equal(stockvel.dataset.active, 'false', 'offscreen previews pause ambient animations');
+    await act(async () => { observeStockvel(true); });
+    assert.equal(stockvel.dataset.active, 'true', 'visible previews resume ambient animations');
+    await click(document.querySelector('#azure-project .delivery-nodes button:nth-child(3)'));
+    assert.equal(document.querySelector('#azure-project .delivery-nodes [aria-pressed=true] strong')!.textContent, 'Automate');
+    assert.match(document.querySelector('#azure-project .delivery-code')!.textContent!, /azure-pipelines.yml.*PushToACR/);
+    assert.match(document.querySelector('#azure-project .delivery-detail')!.textContent!, /Azure DevOps \+ ACR/);
+    assert.equal(document.querySelectorAll('#azure-project .delivery-nodes .is-complete').length, 2);
+    const logbook = document.querySelector('#logbook-project')!;
+    await click(logbook.querySelector('.logbook-selection button'));
+    assert.equal(logbook.querySelector<HTMLElement>('.logbook-task')!.style.getPropertyValue('--column'), '1');
+    assert.match(logbook.querySelector('.logbook-selection button')!.getAttribute('aria-label')!, /Architecture plan to Complete/);
     await click(document.querySelector('#logbook-project .logbook-view-switch button:nth-child(2)'));
     assert.ok(document.querySelector('#logbook-project .logbook-calendar'));
+    await click(logbook.querySelector('.logbook-calendar > div:nth-child(3) button'));
+    assert.equal(logbook.querySelector('.logbook-selection strong')!.textContent, 'Container setup');
     await click(document.querySelector('#logbook-project .logbook-view-switch button:nth-child(3)'));
     assert.ok(document.querySelector('#logbook-project .logbook-timeline'));
+    assert.equal(logbook.querySelector('.logbook-timeline button[aria-pressed=true] > span')!.textContent, 'Build', 'task selection persists across views');
+    await click(logbook.querySelector('.logbook-selection button'));
+    assert.match(logbook.querySelector('.logbook-bottom')!.textContent!, /2 \/ 3 complete/);
+    await click(logbook.querySelector('.logbook-view-switch button:first-child'));
+    assert.equal(logbook.querySelectorAll<HTMLElement>('.logbook-task')[1].style.getPropertyValue('--column'), '2', 'task status persists when returning to the board');
     assert.equal(window.document.querySelector('.topbar [data-view="portfolio"]')!.getAttribute('aria-pressed'), 'true');
     await click(window.document.querySelector('.menu-trigger'));
     assert.equal(window.document.querySelector('.menu-trigger')!.getAttribute('aria-expanded'), 'true');
@@ -69,6 +106,10 @@ test('portfolio navigation, project workspace, themes and shell interactions', a
     assert.ok(window.document.querySelector('a[href="https://wmc.ms.wits.ac.za/students/sgroup3911/index.html"]'));
     await click(window.document.querySelector('.chapter-switcher button:nth-child(2)'));
     assert.ok(window.document.querySelector('.chapter-room'));
+    assert.equal(document.querySelector('#thesis-project .cinema-caption strong')!.textContent, 'Sophomore Room');
+    await click(document.querySelector('#thesis-project .chapter-switcher button:nth-child(3)'));
+    assert.ok(document.querySelector('#thesis-project .chapter-final'));
+    assert.equal(document.querySelector('#thesis-project .cinema-caption strong')!.textContent, 'Final Encounter');
     for (const theme of ['nebula', 'solar', 'orbit', 'nebula']) {
       await chooseTheme('.topbar .theme-picker select', theme);
     }
@@ -165,6 +206,8 @@ test('portfolio navigation, project workspace, themes and shell interactions', a
     await chooseTheme('.workspace-header .theme-picker select', 'nebula');
     await command('open thesis');
     assert.ok(window.document.querySelector('.command-preview.mobile-active .thesis-screen'));
+    const sceneIds = Array.from(document.querySelectorAll('.cinema-scene [id]')).map(element => element.id);
+    assert.equal(new Set(sceneIds).size, sceneIds.length, 'portfolio and terminal scenes use unique SVG references');
     assert.equal(window.document.querySelector('.preview-description a:last-child')!.getAttribute('href'), 'https://wmc.ms.wits.ac.za/students/sgroup3911/index.html');
     await click(window.document.querySelector('.workspace-mobile-tabs button:first-child'));
     await command('open work');
@@ -188,6 +231,13 @@ test('portfolio navigation, project workspace, themes and shell interactions', a
       assert.ok(window.document.querySelector('.game-stage canvas'));
       await click(window.document.querySelector('.game-close'));
     }
+    await chooseTheme('.topbar .theme-picker select', 'orbit');
+    await act(async () => { root.render(<App key="return-visit" />); });
+    assert.ok(document.querySelector('.site-shell.theme-orbit'), 'an Orbit choice made after migration still persists');
+    window.localStorage.removeItem('zm-theme');
+    window.localStorage.removeItem('zm-theme-default');
+    await act(async () => { root.render(<App key="first-visit" />); });
+    assert.ok(document.querySelector('.site-shell.theme-solar'), 'new visitors start in Solar');
   } finally {
     await act(async () => root.unmount());
     dom.window.close();

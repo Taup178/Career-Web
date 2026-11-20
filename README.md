@@ -25,14 +25,15 @@ The build produces a static site in `dist/`. Tailwind utilities are compiled loc
 ## Explore
 
 - The fixed header keeps **Portfolio / Terminal** visible, including on phones. Switching back preserves your page position and terminal session.
-- Solar is the default theme for visitors without a saved choice. The labelled **Theme** selector in both view headers switches between Orbit, Nebula and Solar, including on phones. **Appearance** in the footer also offers the themes and animation pause control. Both preferences persist locally, and reduced-motion system preferences are respected.
+- Solar is the default theme, including the initial page colors. An older saved Orbit default migrates to Solar once; subsequent theme choices persist. The labelled **Theme** selector in both view headers switches between Solar, Orbit and Nebula, including on phones. **Appearance** in the footer also offers the themes and animation pause control. Both preferences persist locally, and reduced-motion system preferences are respected.
 - The identity badge swings gently with its lanyard. Pause or resume it with the animation control in **Appearance**; reduced-motion preferences are respected. Drag the badge, or focus it and use arrow keys. Enter resets it.
 - The footer **Appearance** panel closes when you select an option, click outside, move focus away, press Escape, click its close button, or toggle the heading again.
 - Open the 30-second recruiter brief from the hero.
 - Open the terminal using the view switch, hero button or Ctrl/⌘+K. Return with **Portfolio** or Escape. On desktop, projects appear to the left of the terminal. On small screens, use the Command line / Project visuals buttons; reopening always shows the command line.
 - Project jump links lead to Stockvel-Pro, DevOps Practices, Digital Logbook, then Thesis of the Dead. This order is shared by the portfolio, terminal and recruiter brief.
 - `get` commands display details inside the terminal; `open work`, `open stack`, `open about`, `open contact` and `open play` take you to the corresponding portfolio section.
-- Select chapters in the Thesis illustration, services in the Stockvel diagram, or stages in the Azure flow.
+- Select a Stockvel service to trace its request route, or a delivery stage to inspect an illustrative configuration. Switch Logbook views, select tasks and advance their status. Task selection and progress persist between views within each preview.
+- The Thesis chapter explorer crossfades between layered SVG scenes. Fine-pointer movement shifts the camera gently. Preview animations pause outside the viewport or when the browser tab is hidden; Appearance and reduced-motion preferences also stop transitions and camera movement.
 
 ```text
 help                  # Five small command groups
@@ -62,8 +63,8 @@ DevOps Practices links to https://github.com/Zamam03/Microsoft-Azure. Its summar
 
 Digital Logbook is the third project and is credited as a team project. My contribution was architecture planning, containerization and deployments. Its repository is https://github.com/logb945/Digital-Logbook and its hosted frontend is https://digital-logbook-dhtq.onrender.com. Tools and architecture were checked against the README, frontend and API gateway package manifests, Dockerfiles and repository tree. The Kanban, calendar and timeline display is an illustrative preview with sample entries, separate from the live app.
 
-The chapter scenes are CSS illustrations, labelled accordingly; they are not screenshots or an embedded copy of the full game. The hero deployment board is a labelled simulation. `status` reports local browser values, not external service health.
+The chapter scenes are SVG illustrations, labelled as chapter studies. The hero deployment board is a labelled simulation. `status` reports local browser values, not external service health. Shared preview behavior lives in `ProjectPreview.tsx`; visual styling is in `project-previews.css`.
 
 ## Verification
 
-Shell tests cover navigation, completion, manuals, literal input, project actions and secret discovery. DOM interaction tests cover project ordering, view switching, mobile workspace state, focus restoration, keyboard shortcuts, theme persistence, recruiter brief, project previews, terminal history, safe rendering and opening all three arcade games. They do not replace visual or gameplay QA in a real browser.
+Shell tests cover navigation, completion, manuals, literal input, project actions and secret discovery. DOM interaction tests cover project ordering, view switching, mobile workspace state, focus restoration, keyboard shortcuts, theme persistence, recruiter brief, service and delivery selections, Logbook task state across views, chapter switching, unique SVG references, offscreen animation pausing, terminal history, safe rendering and all three arcade games. They do not replace visual or gameplay QA in a real browser.

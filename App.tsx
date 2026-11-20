@@ -74,7 +74,12 @@ const ExternalIcon = () => (
 );
 
 const App: React.FC = () => {
-  const [theme, setTheme] = useState<Theme>(() => { const saved = readPreference('zm-theme'); return isTheme(saved) ? saved : 'solar'; });
+  const [theme, setTheme] = useState<Theme>(() => {
+    const saved = readPreference('zm-theme');
+    // Replace the legacy Orbit default once, then preserve subsequent choices.
+    const legacyOrbit = saved === 'orbit' && readPreference('zm-theme-default') !== 'solar';
+    return isTheme(saved) && !legacyOrbit ? saved : 'solar';
+  });
   const [motion, setMotion] = useState(() => readPreference('zm-motion') !== 'off');
   const [preview, setPreview] = useState<ProjectId>('stockvel');
   const [mobilePreview, setMobilePreview] = useState(false);
@@ -104,7 +109,10 @@ const App: React.FC = () => {
     return () => media.removeEventListener('change', sync);
   }, []);
 
-  useEffect(() => { savePreference('zm-theme', theme); }, [theme]);
+  useEffect(() => {
+    savePreference('zm-theme', theme);
+    savePreference('zm-theme-default', 'solar');
+  }, [theme]);
   useEffect(() => { savePreference('zm-motion', motion ? 'on' : 'off'); }, [motion]);
   useEffect(() => {
     if (!terminalOpen && !showHireMe && !showMatrix && gameState === GameState.None) return;
@@ -235,12 +243,12 @@ const App: React.FC = () => {
           <div className="hero-copy reveal">
             <div className="eyebrow"><span className="status-dot" /> Open to junior &amp; graduate roles</div>
             <h1>I turn fragile releases into <em>calm, repeatable systems.</em></h1>
-            <p className="hero-intro">Computer Science finalist building practical experience in cloud, automation and software development. {profile.careerFocus}</p>
+            <p className="hero-intro">Computer Science finalist building cloud infrastructure, delivery automation and dependable software.</p>
             <div className="hero-actions">
               <button className="primary-button" onClick={() => goTo('work')}>View projects <ArrowIcon /></button>
               <button className="text-button" onClick={() => changeView('terminal')}><span aria-hidden="true">&gt;_</span> Open terminal</button>
             </div>
-            <button className="brief-trigger" onClick={() => setShowHireMe(true)}><span>↳</span> Short on time? Open the 30-second brief <span>↗</span></button>
+            <button className="brief-trigger" onClick={() => setShowHireMe(true)}>30-second brief <span>↗</span></button>
           </div>
 
           <div className="hero-visual reveal delay-1" aria-label="Animated deployment system diagram">
@@ -260,9 +268,8 @@ const App: React.FC = () => {
               </div>
               <div className="deck-lower">
                 <div className="metric-panel">
-                  <div className="metric-heading"><span>ILLUSTRATIVE BUILD HISTORY</span><strong>10</strong></div>
+                  <div className="metric-heading"><span>BUILD HISTORY</span><strong>10</strong></div>
                   <div className="bars">{[36, 52, 44, 70, 62, 78, 72, 90, 82, 96].map((height, i) => <i key={i} style={{ height: `${height}%` }} />)}</div>
-                  <small>Concept visualization · sample data</small>
                 </div>
                 <div className="log-panel">
                   <span className="log-title">activity.log</span>
@@ -271,24 +278,20 @@ const App: React.FC = () => {
               </div>
               <div className="deck-footer"><span>AZURE</span><span>KUBERNETES</span><span>GITHUB ACTIONS</span><span>DOCKER</span></div>
             </div>
-            <div className="orbit-badge"><span>ZM</span><small>BUILD<br />BETTER</small></div>
             <IdentityBadge />
           </div>
-          <div className="scroll-cue"><span>Scroll to inspect</span><i /></div>
         </section>
 
         <section id="work" className="work-section section-pad">
           <figure className="profile-intro">
             <div className="profile-photo"><img src="/zamokuhle-maziya.jpg" alt={profile.name} width="144" height="144" loading="lazy" decoding="async" /></div>
             <figcaption>
-              <span>BEHIND THE SYSTEMS</span>
               <strong>{profile.name}</strong>
               <p>DevOps &amp; Cloud · Johannesburg</p>
             </figcaption>
           </figure>
           <div className="section-heading">
-            <div><span className="section-number">02 / SELECTED WORK</span><h2>Systems, not<br /><em>just screenshots.</em></h2></div>
-            <p>Projects explained through the decisions, infrastructure and delivery thinking behind them.</p>
+            <div><span className="section-number">02 / PROJECTS</span><h2>Selected <em>work.</em></h2></div>
           </div>
           <nav className="project-jump-links" aria-label="Jump to a project">
             {projects.map((project, index) => <a key={project.id} href={`#${project.id}-project`}><span>0{index + 1}</span>{project.title}<span aria-hidden="true">↓</span></a>)}
@@ -296,12 +299,11 @@ const App: React.FC = () => {
 
           <article id="stockvel-project" className="project-feature stockvel-feature">
             <div className="project-copy">
-              <span className="project-index">01 — FEATURED SYSTEM</span><h3>Stockvel-Pro</h3>
-              <p className="project-lead">A cloud-based microservice platform designed to make community finance coordination more reliable and easier to evolve.</p>
+              <span className="project-index">01 / CLOUD MICROSERVICES</span><h3>Stockvel-Pro</h3>
+              <p className="project-lead">Community finance, built with independent services behind a single API gateway.</p>
               <div className="project-facts">
-                <div><span>ARCHITECTURE</span><strong>API gateway + 5 services</strong></div><div><span>DELIVERY</span><strong>Automated CI/CD</strong></div><div><span>RUNTIME</span><strong>Containers + Kubernetes</strong></div>
+                <div><span>SERVICES</span><strong>5 microservices</strong></div><div><span>DELIVERY</span><strong>GitHub Actions</strong></div><div><span>RUNTIME</span><strong>Docker + Kubernetes</strong></div>
               </div>
-              <p className="project-detail">I separated authentication, payments, meetings, analytics and stockvel management into focused services, then built repeatable environments and deployment workflows around them.</p>
               <a className="project-link" href="https://github.com/Zamam03/Stockvel-Microservice" target="_blank" rel="noreferrer">View repository <ExternalIcon /></a>
             </div>
 
@@ -310,22 +312,20 @@ const App: React.FC = () => {
 
           <article id="azure-project" className="project-feature azure-feature">
             <DevOpsVisual />
-            <div className="project-copy"><span className="project-index">02 — INFRASTRUCTURE &amp; DELIVERY</span><h3>{devopsProject.title}</h3>
+            <div className="project-copy"><span className="project-index">02 / INFRASTRUCTURE &amp; DELIVERY</span><h3>{devopsProject.title}</h3>
               <p className="project-lead">{devopsProject.description}</p>
-              <p className="project-detail">Includes a multi-service voting app, Terraform and ARM templates, Kubernetes manifests, and an Azure DevOps → ACR → ArgoCD deployment guide. Select a practice in the map to explore it.</p>
               <div className="tool-ribbon">{devopsProject.tools.map(tool => <span key={tool}>{tool}</span>)}</div>
-              <a className="project-link" href={devopsProject.source} target="_blank" rel="noreferrer">Explore the practices <ExternalIcon /></a>
+              <a className="project-link" href={devopsProject.source} target="_blank" rel="noreferrer">View repository <ExternalIcon /></a>
             </div>
           </article>
 
           <article id="logbook-project" className="project-feature logbook-feature">
             <DigitalLogbookVisual />
             <div className="project-copy">
-              <span className="project-index">03 — TEAM PROJECT / PLANNING PLATFORM</span>
+              <span className="project-index">03 / PLANNING PLATFORM · TEAM PROJECT</span>
               <h3>{logbookProject.title}</h3>
               <p className="project-lead">{logbookProject.description}</p>
               <div className="project-contribution"><span>MY CONTRIBUTION</span><strong>{logbookProject.contribution}</strong></div>
-              <p className="project-detail">The platform brings a React client, API gateway and dedicated authentication, dashboard, project and profile services together with Supabase. My work focused on architecture planning, containerizing the system with Docker and Compose, and deployments to Render.</p>
               <div className="project-actions">
                 <a className="project-link play-link" href={logbookProject.live} target="_blank" rel="noreferrer">{logbookProject.liveLabel} <ArrowIcon /></a>
                 <a className="project-link" href={logbookProject.source} target="_blank" rel="noreferrer">View source <ExternalIcon /></a>
@@ -337,15 +337,14 @@ const App: React.FC = () => {
           <article id="thesis-project" className="project-feature thesis-feature">
             <ThesisProjectVisual />
             <div className="project-copy">
-              <span className="project-index">04 — INTERACTIVE 3D GAME / TEAM PROJECT</span>
+              <span className="project-index">04 / 3D BROWSER GAME · TEAM PROJECT</span>
               <h3>Thesis of<br />the Dead</h3>
-              <p className="project-lead">A team-built browser survival game where a student fights through the zombie-infested landscape of their degree—from the Freshman Woods to a final showdown with the Dean.</p>
+              <p className="project-lead">Survive a degree overrun by zombies, from Freshman Woods to a final showdown with the Dean.</p>
               <div className="project-facts">
                 <div><span>ENGINE</span><strong>Three.js + WebGL</strong></div>
                 <div><span>EXPERIENCE</span><strong>3 chapters + bosses</strong></div>
                 <div><span>SYSTEMS</span><strong>Combat, AI, shaders</strong></div>
               </div>
-              <p className="project-detail">Built with ES modules, custom GLSL shader materials, GLTF pipelines, post-processing, Web Audio, checkpointed puzzles, combat systems and configurable graphics quality.</p>
               <div className="project-actions">
                 <a className="project-link play-link" href="https://wmc.ms.wits.ac.za/students/sgroup3911/index.html" target="_blank" rel="noreferrer">Play live <ArrowIcon /></a>
                 <a className="project-link" href="https://github.com/Taup178/Thesis_of_the_dead" target="_blank" rel="noreferrer">View source <ExternalIcon /></a>
@@ -359,7 +358,6 @@ const App: React.FC = () => {
           <div className="capabilities-heading">
             <span className="section-number">03 / CAPABILITIES</span>
             <h2 id="capabilities-title">Build. Automate. <em>Deploy.</em></h2>
-            <p>Three areas I’m developing through hands-on projects.</p>
           </div>
           <div className="capability-grid">
             {capabilities.map(capability => <article className="cap-card" key={capability.label}>
@@ -373,7 +371,7 @@ const App: React.FC = () => {
               <div className="cap-command"><span aria-hidden="true">$</span><code>{capability.command}</code></div>
             </article>)}
             <article className="cap-card wide">
-              <div><h3>Software foundations</h3><p>Computer Science fundamentals and practical backend development support the work above.</p></div>
+              <div><h3>Software foundations</h3><p>Computer Science fundamentals and backend development.</p></div>
               <ul className="stack-cloud" aria-label="Software foundation tools">{foundationTools.map(tool => <li key={tool}>{tool}</li>)}</ul>
             </article>
           </div>
@@ -382,21 +380,29 @@ const App: React.FC = () => {
         <section id="about" className="about-section section-pad">
           <div className="about-statement"><span className="section-number">04 / ABOUT</span><blockquote>Turning a messy process into a <em>system people can trust.</em></blockquote></div>
           <div className="about-grid">
-            <div className="about-copy"><p>I’m Zamokuhle, a final-year Computer Science student at the University of the Witwatersrand, based in Johannesburg.</p><p>{profile.careerFocus} I enjoy connecting software, infrastructure and automation to build useful, reliable systems.</p><button className="text-button" onClick={() => setShowHireMe(true)}>Why I’m a strong teammate <ArrowIcon /></button></div>
+            <div className="about-copy"><p>I’m a final-year Computer Science student at the University of the Witwatersrand in Johannesburg.</p><p>I enjoy the work between writing software and running it well: planning services, automating delivery and making systems easier to maintain.</p><button className="text-button" onClick={() => setShowHireMe(true)}>Read my brief <ArrowIcon /></button></div>
             <div className="timeline">
               <div><span>NOW</span><i /><section><small>UNIVERSITY OF THE WITWATERSRAND</small><strong>BSc Computer Science</strong><p>Final-year student · Johannesburg</p></section></div>
               <div><span>FOUNDATION</span><i /><section><small>NJEYEZA SECONDARY SCHOOL</small><strong>National Senior Certificate</strong><p>Matriculated with distinction</p></section></div>
-              <div><span>NEXT</span><i /><section><small>THE MISSION</small><strong>DevOps &amp; Cloud focus</strong><p>Also open to junior and graduate software engineering roles.</p></section></div>
             </div>
           </div>
         </section>
 
         <section id="playground" className="playground-section section-pad">
-          <div className="playground-copy"><span className="section-number">05 / AFTER HOURS</span><h2>Every good system needs an <em>easter egg.</em></h2><p>A little curiosity goes a long way. Take a break in the arcade, or explore commands, themes and hidden surprises in the terminal.</p><button className="primary-button dark" onClick={() => changeView('terminal')}>&gt;_ Open terminal <ArrowIcon /></button></div>
+          <div className="playground-copy"><span className="section-number">05 / AFTER HOURS</span><h2>A little <em>play.</em></h2><p>Three arcade classics, built for the browser.</p></div>
           <div className="arcade-grid">
-            <button onClick={() => setGameState(GameState.Bird)}><span className="game-glyph bird-glyph">◆</span><small>01 / REFLEX</small><strong>Flappy<br />Bird</strong><i>PLAY ↗</i></button>
-            <button onClick={() => setGameState(GameState.Snake)}><span className="game-glyph snake-glyph">▦</span><small>02 / STRATEGY</small><strong>Cyber<br />Snake</strong><i>PLAY ↗</i></button>
-            <button onClick={() => setGameState(GameState.Pacman)}><span className="game-glyph pacman-glyph">◕</span><small>03 / CLASSIC</small><strong>Cyber<br />Pac-Man</strong><i>PLAY ↗</i></button>
+            <button className="arcade-card bird-card" type="button" onClick={() => setGameState(GameState.Bird)} aria-label="Play Flappy Bird">
+              <span className="arcade-art"><img src="/arcade/bird.svg" alt="" width="480" height="360" loading="lazy" decoding="async" /></span>
+              <span className="arcade-card-copy"><span><small>01 / REFLEX</small><strong>Flappy Bird</strong></span><span className="arcade-play"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="m5 3 8 5-8 5Z" fill="currentColor" /></svg>Play</span></span>
+            </button>
+            <button className="arcade-card snake-card" type="button" onClick={() => setGameState(GameState.Snake)} aria-label="Play Cyber Snake">
+              <span className="arcade-art"><img src="/arcade/snake.svg" alt="" width="480" height="360" loading="lazy" decoding="async" /></span>
+              <span className="arcade-card-copy"><span><small>02 / STRATEGY</small><strong>Cyber Snake</strong></span><span className="arcade-play"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="m5 3 8 5-8 5Z" fill="currentColor" /></svg>Play</span></span>
+            </button>
+            <button className="arcade-card pacman-card" type="button" onClick={() => setGameState(GameState.Pacman)} aria-label="Play Cyber Pac-Man">
+              <span className="arcade-art"><img src="/arcade/pacman.svg" alt="" width="480" height="360" loading="lazy" decoding="async" /></span>
+              <span className="arcade-card-copy"><span><small>03 / CLASSIC</small><strong>Cyber Pac-Man</strong></span><span className="arcade-play"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="m5 3 8 5-8 5Z" fill="currentColor" /></svg>Play</span></span>
+            </button>
           </div>
         </section>
 
@@ -404,7 +410,7 @@ const App: React.FC = () => {
           <div className="contact-orbit"><span>AVAILABLE</span><i>✦</i><span>JOHANNESBURG</span><i>✦</i></div>
           <span className="section-number">06 / LET’S CONNECT</span><h2>Have a system to improve<br />or a team to grow?</h2>
           <a className="contact-email" href="mailto:zamokuhlemaziya944@gmail.com">zamokuhlemaziya944@gmail.com <ArrowIcon /></a>
-          <div className="contact-bottom"><p>{profile.careerFocus} Junior and graduate opportunities welcome.</p><div className="social-links"><a href="https://linkedin.com/in/zamokuhle-maziya" target="_blank" rel="noreferrer">LinkedIn <span>↗</span></a><a href={profile.github} target="_blank" rel="noreferrer">GitHub <span>↗</span></a></div></div>
+          <div className="contact-bottom"><p>Available for junior and graduate roles in DevOps, cloud and software engineering.</p><div className="social-links"><a href="https://linkedin.com/in/zamokuhle-maziya" target="_blank" rel="noreferrer">LinkedIn <span>↗</span></a><a href={profile.github} target="_blank" rel="noreferrer">GitHub <span>↗</span></a></div></div>
         </section>
       </main>
 

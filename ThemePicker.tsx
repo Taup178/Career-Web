@@ -11,9 +11,9 @@ export default function ThemePicker({ theme, onChange }: {
     <select aria-label="Color theme" value={theme} onChange={event => {
       if (isTheme(event.target.value)) onChange(event.target.value);
     }}>
+      <option value="solar">Solar</option>
       <option value="orbit">Orbit</option>
       <option value="nebula">Nebula</option>
-      <option value="solar">Solar</option>
     </select>
   </label>;
 }

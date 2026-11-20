@@ -20,7 +20,6 @@ export default function HireMeModal({ onClose }: { onClose: () => void }) {
       </div>
       <div className="brief-education"><small>EDUCATION</small><strong>BSc Computer Science</strong><span>University of the Witwatersrand · final-year student</span></div>
       <div className="brief-contact"><a href={'mailto:' + profile.email}>{profile.email} ↗</a><button onClick={copy}>Copy email</button><span role="status">{copied}</span></div>
-      <p className="term-tip">Open to junior and graduate opportunities, plus thoughtful collaborations.</p>
     </article>
   </Modal>;
 }

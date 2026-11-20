@@ -80,13 +80,12 @@ export default function Terminal({ onCommand, isMatrixCommandUnlocked, active, t
         {group ? <div className="term-command-list">{group.commands.map(([command, description]) =>
           <button key={command} onClick={() => run(command)}><b>{command}</b><span>{description}</span></button>
         )}</div> : <>
-          <p>Choose a category. Click any command to run it.</p>
           <div className="term-help-grid">{Object.entries(manuals).map(([key, page]) =>
             <button key={key} onClick={() => run('help ' + key)}><b>help {key}</b><small>{page.title}</small></button>
           )}</div>
         </>}
         {isMatrixCommandUnlocked && result.subject === 'arcade' && <button className="term-inline" onClick={() => run('matrix')}>matrix → classified channel</button>}
-        <p className="term-tip">↑ ↓ history · Tab complete · Ctrl+L clear · Ctrl+C cancel</p>
+        <p className="term-tip">↑ ↓ history · Tab complete · Ctrl+L clear</p>
       </div>;
     }
     if (result.view === 'projects' || result.view === 'links') {
@@ -154,7 +153,7 @@ export default function Terminal({ onCommand, isMatrixCommandUnlocked, active, t
   return <div className="terminal-screen">
     <div className="terminal-titlebar"><div className="terminal-dots"><i /><i /><i /></div><span className="terminal-title">visitor@zm-os · browser shell</span><span className="terminal-health"><i /> LOCAL</span></div>
     <div className="terminal-output" ref={output} role="log" aria-live="polite" aria-label="Command output">
-      {!entries.length && <div className="terminal-boot"><div><span>ZM—OS</span><b>EXPLORER EDITION</b></div><p>Your shortcut to the person behind the systems.</p><p>Start with <button onClick={() => run('help')}>help</button>, <button onClick={() => run('get projects')}>get projects</button> or <button onClick={() => run('brief')}>brief</button>.</p><small>Simulated Linux shell · runs entirely in your browser</small></div>}
+      {!entries.length && <div className="terminal-boot"><div><span>ZM—OS</span></div><p>Start with <button onClick={() => run('help')}>help</button>, <button onClick={() => run('get projects')}>get projects</button> or <button onClick={() => run('brief')}>brief</button>.</p><small>Simulated browser shell</small></div>}
       {entries.map(entry => <div className="terminal-line" key={entry.id}>
         {entry.command && <div className="term-prompt-line"><span>visitor@zm-os</span>:<b>{shortPath(entry.cwd!)}</b>$ {entry.command}</div>}
         {renderResult(entry.result)}
@@ -166,6 +165,6 @@ export default function Terminal({ onCommand, isMatrixCommandUnlocked, active, t
       <input id="shell-input" ref={input} value={value} onChange={event => { setValue(event.target.value); setHistoryIndex(-1); setSuggestions([]); }} onKeyDown={onKeyDown} maxLength={1000} autoComplete="off" autoCapitalize="off" spellCheck={false} aria-label="Terminal command" placeholder="type a command…" />
       <button type="submit" className="terminal-run" aria-label="Run command">↵</button>
     </form>
-    <div className="terminal-quick"><span>QUICK EXEC</span>{['help', 'get projects', 'neofetch', 'brief'].map(command => <button key={command} onClick={() => run(command)}>{command}</button>)}</div>
+    <div className="terminal-quick">{['help', 'get projects', 'neofetch', 'brief'].map(command => <button key={command} onClick={() => run(command)}>{command}</button>)}</div>
   </div>;
 }
