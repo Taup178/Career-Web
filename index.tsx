@@ -5,6 +5,7 @@ import App from './App';
 import './index.css';
 import './polish.css';
 import './project-previews.css';
+import './arcade.css';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {

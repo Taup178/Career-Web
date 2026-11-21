@@ -212,7 +212,6 @@ const App: React.FC = () => {
 
       {gameState !== GameState.None && (
         <Modal open onClose={() => setGameState(GameState.None)} className="game-modal" label="Portfolio arcade game">
-          <button className="game-close" onClick={() => setGameState(GameState.None)}>Close arcade ×</button>
           <div className="game-stage">{renderGame()}</div>
         </Modal>
       )}

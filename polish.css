@@ -40,9 +40,6 @@ section[id], article[id] { scroll-margin-top: 105px; }
 .social-links a:hover { color: var(--accent); }
 .contact-bottom p { font-size: 13px; }
 footer { font-size: 9px; }
-.game-modal { color: #e8ece8; padding-top: 60px; }
-.game-close { position: absolute; top: 12px; right: 24px; padding: 8px 14px; border: 1px solid #ffffff40; color: white; background: #141b17; border-radius: 6px; font: 12px var(--mono); z-index: 2; }
-.game-stage { min-height: 0; }
 
 /* A workspace with a dedicated project display beside the shell. */
 .terminal-layer { padding: 18px; background: #030504e8; backdrop-filter: blur(18px); }

@@ -1,411 +1,76 @@
+import React, { useState } from 'react';
+import { ArcadeFrame, roundSeed, useArcadeCanvas, useArcadeLoop, useArcadeSession } from './Arcade';
+import type { ArcadeGameProps } from './Arcade';
+import { BIRD, createBird, flapBird, tickBird } from './arcadeEngine';
+import type { BirdState } from './arcadeEngine';
+import { playFlapSound } from './audio';
 
-import { readPreference, savePreference } from './portfolio';
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { playFlapSound, playDeathSound } from './audio';
-
-interface Pipe {
-  x: number;
-  topHeight: number;
-  passed: boolean;
+function drawBirdWorld(ctx: CanvasRenderingContext2D, state: BirdState) {
+  const sky = ctx.createLinearGradient(0, 0, 0, 600);
+  sky.addColorStop(0, '#10232e'); sky.addColorStop(.6, '#294442'); sky.addColorStop(1, '#576957');
+  ctx.fillStyle = sky; ctx.fillRect(0, 0, 600, 600);
+  const halo = ctx.createRadialGradient(420, 135, 10, 420, 135, 190);
+  halo.addColorStop(0, '#e8ce8e22'); halo.addColorStop(1, '#e8ce8e00');
+  ctx.fillStyle = halo; ctx.fillRect(0, 0, 600, 390);
+  ctx.fillStyle = '#d8d1ab'; ctx.beginPath(); ctx.arc(420, 135, 38, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#c1b99544'; ctx.beginPath(); ctx.arc(406, 127, 8, 0, Math.PI * 2); ctx.fill();
+  for (let i = 0; i < 7; i++) {
+    const x = (i * 111 - state.elapsed * (5 + i % 3) + 900) % 800 - 100;
+    const y = 74 + i % 3 * 68;
+    ctx.fillStyle = '#d9e6d510'; ctx.beginPath(); ctx.ellipse(x, y, 65, 11, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(x - 16, y - 7, 28, 12, 0, 0, Math.PI * 2); ctx.fill();
+  }
+  for (let layer = 0; layer < 3; layer++) {
+    ctx.fillStyle = ['#253f3e', '#203c36', '#17332d'][layer];
+    const drift = state.elapsed * (8 + layer * 6);
+    ctx.beginPath(); ctx.moveTo(0, 600);
+    for (let x = 0; x <= 620; x += 20) ctx.lineTo(x, 385 + layer * 51 + Math.sin((x + drift) / (90 - layer * 15)) * (35 - layer * 6) + Math.sin((x + drift) / 43) * 10);
+    ctx.lineTo(620, 600); ctx.closePath(); ctx.fill();
+  }
+  for (const pipe of state.pipes) {
+    const shade = ctx.createLinearGradient(pipe.x, 0, pipe.x + BIRD.pipeWidth, 0);
+    shade.addColorStop(0, '#2d5b49'); shade.addColorStop(.22, '#7ca77c'); shade.addColorStop(.75, '#47785a'); shade.addColorStop(1, '#234d3f');
+    ctx.fillStyle = shade;
+    ctx.fillRect(pipe.x, 0, BIRD.pipeWidth, pipe.top - 9);
+    ctx.fillRect(pipe.x, pipe.top + BIRD.gap + 9, BIRD.pipeWidth, BIRD.ground - pipe.top - BIRD.gap);
+    ctx.strokeStyle = '#b6d09c55'; ctx.lineWidth = 1.3;
+    for (const y of [pipe.top - 21, pipe.top + BIRD.gap]) {
+      ctx.beginPath(); ctx.roundRect(pipe.x - 4, y, BIRD.pipeWidth + 8, 21, 4); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#d0dfb22a'; ctx.fillRect(pipe.x + 2, y + 3, BIRD.pipeWidth - 4, 2); ctx.fillStyle = shade;
+    }
+    ctx.fillStyle = '#d2e0b522'; ctx.fillRect(pipe.x + 7, 0, 3, pipe.top - 24);
+    ctx.fillRect(pipe.x + 7, pipe.top + BIRD.gap + 24, 3, BIRD.ground - pipe.top - BIRD.gap - 24);
+  }
+  ctx.fillStyle = '#1b3029'; ctx.fillRect(0, BIRD.ground, 600, 44);
+  ctx.fillStyle = '#7e9461'; ctx.fillRect(0, BIRD.ground, 600, 3);
+  ctx.fillStyle = '#465a3e'; ctx.fillRect(0, BIRD.ground + 3, 600, 5);
+  ctx.strokeStyle = '#a2b47b1c'; ctx.lineWidth = 2;
+  for (let i = 0; i < 23; i++) {
+    const x = i * 32 - (state.elapsed * 190) % 32;
+    ctx.beginPath(); ctx.moveTo(x, 574); ctx.lineTo(x + 9, 574); ctx.stroke();
+  }
+  ctx.save(); ctx.translate(BIRD.x, state.y); ctx.rotate(Math.max(-.4, Math.min(1.15, state.velocity / 520)));
+  ctx.shadowColor = '#07181255'; ctx.shadowBlur = 12; ctx.shadowOffsetY = 7;
+  ctx.fillStyle = '#dda247'; ctx.beginPath(); ctx.moveTo(-18, -3); ctx.lineTo(-36, -13); ctx.lineTo(-30, 0); ctx.lineTo(-35, 8); ctx.lineTo(-18, 7); ctx.fill();
+  const body = ctx.createLinearGradient(-10, -18, 8, 20);
+  body.addColorStop(0, '#fff0a7'); body.addColorStop(.4, '#f6cf65'); body.addColorStop(1, '#d99538');
+  ctx.fillStyle = body; ctx.beginPath(); ctx.ellipse(0, 0, 25, 19, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
+  ctx.fillStyle = '#ffe9a3'; ctx.beginPath(); ctx.ellipse(-9, 3 + Math.sin(state.elapsed * 19) * 3, 13, 8, -.2, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = '#d6a24a'; ctx.lineWidth = 1; ctx.stroke();
+  ctx.fillStyle = '#f29a48'; ctx.beginPath(); ctx.moveTo(20, 0); ctx.lineTo(36, 4); ctx.lineTo(21, 10); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#fffbed'; ctx.beginPath(); ctx.ellipse(12, -6, 8, 9, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#182b30'; ctx.beginPath(); ctx.ellipse(15, -6, 3.8, 5.2, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(16, -8, 1.4, 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
 }
 
-interface Cloud {
-  x: number;
-  y: number;
-  speed: number;
-  scale: number;
-  opacity: number;
+export default function BirdGame(props: ArcadeGameProps) {
+  const [state, setState] = useState(() => createBird());
+  const session = useArcadeSession('bird_highscore', state.score, state.status, 30, props);
+  useArcadeLoop(session.running, 1000 / 60, () => setState(tickBird));
+  const surface = useArcadeCanvas(600, 600, ctx => drawBirdWorld(ctx, state));
+  const start = () => { setState(createBird(roundSeed())); session.begin(); };
+  const flap = () => { if (session.running) { setState(flapBird); playFlapSound(); } };
+  return <ArcadeFrame kind="bird" title="Flappy Bird" index="01" headline="A little airtime." instruction="Find your rhythm. Tap or press Space to fly between the pipes." score={state.score} session={session} surface={surface} onStart={start} onAction={flap} onClose={props.stopGame} blocked={props.isNotificationVisible} />;
 }
-
-interface BirdGameProps {
-  stopGame: () => void;
-  onMatrixNotification: () => void;
-  isNotificationVisible: boolean;
-}
-
-const BirdGame: React.FC<BirdGameProps> = ({ stopGame, onMatrixNotification, isNotificationVisible }) => {
-  const [birdY, setBirdY] = useState(300);
-  const [birdVelocity, setBirdVelocity] = useState(0);
-  const [pipes, setPipes] = useState<Pipe[]>([]);
-  const [clouds, setClouds] = useState<Cloud[]>([]);
-  const [score, setScore] = useState(0);
-  const [highScore, setHighScore] = useState(() => {
-    return (Number.parseInt(readPreference('bird_highscore') || '0', 10) || 0);
-  });
-  const [isGameOver, setIsGameOver] = useState(false);
-  const [isRunning, setIsRunning] = useState(false);
-  const [matrixNotificationShown, setMatrixNotificationShown] = useState(false);
-  const [wasPausedForNotification, setWasPausedForNotification] = useState(false);
-  
-  const gameWrapperRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [gameDimensions, setGameDimensions] = useState({ width: 600, height: 600 });
-  const gameLoopRef = useRef<number | undefined>(undefined);
-  const lastPipeTimeRef = useRef(0);
-
-  // Responsive scaling
-  const baseWidth = 600;
-  const baseHeight = 600;
-  const scale = gameDimensions.width / baseWidth;
-
-  const groundHeight = 44 * scale;
-  const birdHeight = 32 * scale;
-  const birdWidth = 42 * scale;
-  const birdX = 100 * scale;
-  const pipeWidth = 72 * scale;
-  const pipeGap = 185 * scale;
-  const gravity = 0.22 * scale;
-  const flapStrength = -5.8 * scale;
-
-  useEffect(() => {
-    if (score > highScore) {
-      setHighScore(score);
-      savePreference('bird_highscore', score.toString());
-    }
-  }, [score, highScore]);
-
-  useEffect(() => {
-    if (score >= 30 && !matrixNotificationShown) {
-      onMatrixNotification();
-      setWasPausedForNotification(true);
-      setIsRunning(false); // Pause game
-      setMatrixNotificationShown(true);
-    }
-  }, [score, matrixNotificationShown, onMatrixNotification]);
-
-  useEffect(() => {
-    if (wasPausedForNotification && !isNotificationVisible) {
-      setIsRunning(true);
-      setWasPausedForNotification(false);
-    }
-  }, [isNotificationVisible, wasPausedForNotification]);
-
-  useEffect(() => {
-    if (isGameOver) {
-      playDeathSound();
-    }
-  }, [isGameOver]);
-
-  useEffect(() => {
-    const wrapper = gameWrapperRef.current;
-    if (!wrapper) return;
-
-    const resizeObserver = new ResizeObserver(entries => {
-        if (entries[0]) {
-            const { width, height } = entries[0].contentRect;
-            const aspectRatio = baseWidth / baseHeight;
-            let newWidth = width;
-            let newHeight = width / aspectRatio;
-
-            if (newHeight > height) {
-                newHeight = height;
-                newWidth = height * aspectRatio;
-            }
-            setGameDimensions({ width: newWidth, height: newHeight });
-        }
-    });
-    resizeObserver.observe(wrapper);
-    return () => resizeObserver.disconnect();
-  }, []);
-
-  const startGame = useCallback(() => {
-    setBirdY(gameDimensions.height / 2);
-    setBirdVelocity(0);
-    setPipes([]);
-    setScore(0);
-    setIsGameOver(false);
-    setMatrixNotificationShown(false);
-    lastPipeTimeRef.current = performance.now();
-    
-    const initialClouds: Cloud[] = [];
-    for(let i=0; i<10; i++){
-        initialClouds.push({
-            x: Math.random() * gameDimensions.width,
-            y: Math.random() * gameDimensions.height * 0.4,
-            speed: (0.25 + Math.random() * 0.55),
-            scale: 0.6 + Math.random() * 0.8,
-            opacity: 0.35 + Math.random() * 0.45
-        });
-    }
-    setClouds(initialClouds);
-    setIsRunning(true);
-  }, [gameDimensions.height, gameDimensions.width]);
-
-  const flap = useCallback(() => {
-    if (!isRunning && !isGameOver && !wasPausedForNotification) {
-      startGame();
-    } else if (isRunning && !isGameOver) {
-      playFlapSound();
-      setBirdVelocity(flapStrength);
-    }
-  }, [isGameOver, isRunning, startGame, flapStrength, wasPausedForNotification]);
-
-  const handleKeyPress = useCallback((e: KeyboardEvent) => {
-    if (e.code === 'Space') {
-      e.preventDefault();
-      flap();
-    }
-  }, [flap]);
-  
-  const handleGameClick = useCallback(() => {
-      flap();
-  }, [flap]);
-
-  useEffect(() => {
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [handleKeyPress]);
-
-  useEffect(() => {
-    if (!isRunning) return;
-
-    const gameLoop = (currentTime: number) => {
-      if (!isGameOver) {
-        setBirdVelocity(v => v + gravity);
-        setBirdY(y => {
-          const newY = y + birdVelocity;
-          if (newY > gameDimensions.height - groundHeight - birdHeight || newY < 0) {
-            setIsGameOver(true);
-            setIsRunning(false);
-            return y;
-          }
-          return newY;
-        });
-
-        if (currentTime - lastPipeTimeRef.current > 1550) {
-          const topHeight = Math.random() * (gameDimensions.height - pipeGap - groundHeight - (120 * scale)) + (60 * scale);
-          setPipes(p => [...p, { x: gameDimensions.width, topHeight, passed: false }]);
-          lastPipeTimeRef.current = currentTime;
-        }
-
-        setPipes(currentPipes => {
-          let newScore = score;
-          let collision = false;
-          const updatedPipes = currentPipes
-            .map(pipe => ({ ...pipe, x: pipe.x - (3.2 * scale) }))
-            .filter(pipe => pipe.x > -pipeWidth);
-
-          for (const pipe of updatedPipes) {
-            if (birdX < pipe.x + pipeWidth && birdX + birdWidth > pipe.x &&
-                (birdY < pipe.topHeight || birdY + birdHeight > pipe.topHeight + pipeGap)) {
-              collision = true;
-            }
-
-            if (pipe.x + pipeWidth < birdX && !pipe.passed) {
-              pipe.passed = true;
-              newScore++;
-            }
-          }
-
-          if (collision) {
-            setIsGameOver(true);
-            setIsRunning(false);
-          } else if (newScore !== score) {
-            setScore(newScore);
-          }
-          return updatedPipes;
-        });
-      }
-      gameLoopRef.current = requestAnimationFrame(gameLoop);
-    };
-
-    gameLoopRef.current = requestAnimationFrame(gameLoop);
-
-    return () => {
-      if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current);
-    };
-  }, [isRunning, isGameOver, birdVelocity, gameDimensions, score, gravity, birdY, groundHeight, birdHeight, pipeGap, pipeWidth, scale, birdX]);
-  
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    const ctx = canvas?.getContext('2d');
-    if(!ctx || !canvas) return;
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // Cyberpunk Dusk Sky Gradient
-    const skyGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    skyGradient.addColorStop(0, '#0f172a');
-    skyGradient.addColorStop(0.5, '#1e293b');
-    skyGradient.addColorStop(1, '#334155');
-    ctx.fillStyle = skyGradient;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Rendering must not update cloud state: doing so creates an effect loop.
-    clouds.forEach(cloud => {
-        ctx.fillStyle = `rgba(255, 255, 255, ${cloud.opacity * 0.4})`;
-        ctx.beginPath();
-        const cloudWidth = 65 * cloud.scale * scale;
-        const cloudHeight = 28 * cloud.scale * scale;
-        const drift = isRunning ? performance.now() * cloud.speed * scale * 0.02 : 0;
-        const x = ((cloud.x - drift) % (gameDimensions.width + 150 * scale) + gameDimensions.width + 150 * scale) % (gameDimensions.width + 150 * scale) - 75 * scale;
-        ctx.ellipse(x + cloudWidth / 2, cloud.y, cloudWidth, cloudHeight, 0, 0, Math.PI * 2);
-        ctx.fill();
-    });
-
-    // Pipes
-    pipes.forEach(pipe => {
-        const pipeGradient = ctx.createLinearGradient(pipe.x, 0, pipe.x + pipeWidth, 0);
-        pipeGradient.addColorStop(0, '#10b981');
-        pipeGradient.addColorStop(0.5, '#34d399');
-        pipeGradient.addColorStop(1, '#059669');
-        ctx.fillStyle = pipeGradient;
-        ctx.strokeStyle = '#064e3b';
-        ctx.lineWidth = 3 * scale;
-
-        const topPipeY = 0;
-        const bottomPipeY = pipe.topHeight + pipeGap;
-
-        // Top Pipe
-        ctx.fillRect(pipe.x, topPipeY, pipeWidth, pipe.topHeight);
-        ctx.strokeRect(pipe.x, topPipeY, pipeWidth, pipe.topHeight);
-        ctx.fillRect(pipe.x - 4 * scale, pipe.topHeight - 22 * scale, pipeWidth + 8 * scale, 22 * scale);
-        ctx.strokeRect(pipe.x - 4 * scale, pipe.topHeight - 22 * scale, pipeWidth + 8 * scale, 22 * scale);
-
-        // Bottom Pipe
-        ctx.fillRect(pipe.x, bottomPipeY, pipeWidth, canvas.height - bottomPipeY - groundHeight);
-        ctx.strokeRect(pipe.x, bottomPipeY, pipeWidth, canvas.height - bottomPipeY - groundHeight);
-        ctx.fillRect(pipe.x - 4 * scale, bottomPipeY, pipeWidth + 8 * scale, 22 * scale);
-        ctx.strokeRect(pipe.x - 4 * scale, bottomPipeY, pipeWidth + 8 * scale, 22 * scale);
-    });
-
-    // Ground
-    const groundGrad = ctx.createLinearGradient(0, canvas.height - groundHeight, 0, canvas.height);
-    groundGrad.addColorStop(0, '#d4a657');
-    groundGrad.addColorStop(0.2, '#8b5a2b');
-    groundGrad.addColorStop(1, '#3d2310');
-    ctx.fillStyle = groundGrad;
-    ctx.fillRect(0, canvas.height - groundHeight, canvas.width, groundHeight);
-    
-    ctx.fillStyle = '#f59e0b';
-    ctx.fillRect(0, canvas.height - groundHeight, canvas.width, 6 * scale);
-
-    // Bird
-    const birdRotation = Math.min(Math.max(birdVelocity * 4, -30), 80);
-    ctx.save();
-    ctx.translate(birdX + birdWidth / 2, birdY + birdHeight / 2);
-    ctx.rotate(birdRotation * Math.PI / 180);
-
-    // Body
-    ctx.fillStyle = '#fbbf24';
-    ctx.strokeStyle = '#d97706';
-    ctx.lineWidth = 2 * scale;
-    ctx.beginPath();
-    ctx.ellipse(0, 0, birdWidth / 2, birdHeight / 2, 0, 0, 2 * Math.PI);
-    ctx.fill();
-    ctx.stroke();
-
-    // Wing
-    const wingAngle = Math.sin(Date.now() / 100) * 0.4 - 0.2 + (birdVelocity < 0 ? -0.5 : 0.2);
-    ctx.save();
-    ctx.rotate(wingAngle);
-    ctx.fillStyle = '#fef08a';
-    ctx.beginPath();
-    ctx.ellipse(-birdWidth / 8, 0, birdWidth / 3, birdHeight / 4, 0, 0, 2 * Math.PI);
-    ctx.fill();
-    ctx.stroke();
-    ctx.restore();
-
-    // Beak
-    ctx.fillStyle = '#f97316';
-    ctx.beginPath();
-    ctx.moveTo(birdWidth / 2 - 4 * scale, 0);
-    ctx.lineTo(birdWidth / 2 + 10 * scale, -4 * scale);
-    ctx.lineTo(birdWidth / 2 + 10 * scale, 4 * scale);
-    ctx.closePath();
-    ctx.fill();
-
-    // Eye
-    ctx.fillStyle = 'white';
-    ctx.beginPath();
-    ctx.arc(birdWidth / 4, -birdHeight / 6, 4.5 * scale, 0, 2 * Math.PI);
-    ctx.fill();
-    ctx.fillStyle = '#0f172a';
-    ctx.beginPath();
-    ctx.arc(birdWidth / 4 + 1.5 * scale, -birdHeight / 6, 2.2 * scale, 0, 2 * Math.PI);
-    ctx.fill();
-
-    ctx.restore();
-
-  }, [birdY, birdVelocity, pipes, clouds, gameDimensions, isRunning, isGameOver, groundHeight, birdHeight, birdWidth, birdX, pipeGap, pipeWidth, scale]);
-
-  const restartGame = () => {
-    setIsGameOver(false);
-    setIsRunning(false);
-    startGame();
-  };
-
-  return (
-    <div ref={gameWrapperRef} className="absolute inset-0 bg-[#0f1215]/95 rounded-3xl shadow-2xl border border-[#d4a657]/30 flex items-center justify-center overflow-hidden">
-        <div className="relative" style={{width: gameDimensions.width, height: gameDimensions.height}} onClick={handleGameClick}>
-            <canvas 
-                ref={canvasRef} 
-                width={gameDimensions.width} 
-                height={gameDimensions.height} 
-                className="cursor-pointer rounded-3xl border border-[#334155] shadow-inner"
-            />
-            
-            {/* Top Score HUD */}
-            <div className="absolute top-4 inset-x-0 flex items-center justify-between px-6 z-10 pointer-events-none">
-              <div className="bg-[#0f172a]/80 backdrop-blur-md px-4 py-1.5 rounded-full border border-emerald-500/30 text-emerald-400 font-mono text-sm font-bold shadow-md">
-                HIGH: {highScore}
-              </div>
-              <div className="text-[#f8fafc] text-4xl font-extrabold font-mono [text-shadow:0_4px_12px_rgba(0,0,0,0.6)]">
-                {score}
-              </div>
-              <button 
-                onClick={(e) => { e.stopPropagation(); stopGame(); }} 
-                className="pointer-events-auto px-3 py-1 text-xs font-semibold rounded-full bg-red-500/20 text-red-300 border border-red-500/30 hover:bg-red-500/40 transition"
-              >
-                ✕ Exit
-              </button>
-            </div>
-            
-            {/* Start Game Overlay */}
-            {(!isRunning && !isGameOver && !wasPausedForNotification) && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center z-20 bg-[#0a0c0e]/85 backdrop-blur-md rounded-3xl p-6 text-center animate-fade-in">
-                    <div className="text-5xl mb-2">🐤</div>
-                    <h2 className="text-[#f8fafc] text-4xl font-extrabold mb-2 tracking-wide [text-shadow:0_2px_10px_rgba(212,166,87,0.3)]">FLAPPY BIRD</h2>
-                    <p className="text-[#94a3b8] text-sm mb-6 max-w-xs">Navigate the matrix pipes. Score 30 points to unlock the secret terminal command!</p>
-                    <button 
-                      onClick={(e) => { e.stopPropagation(); startGame(); }} 
-                      className="px-8 py-3 text-lg rounded-2xl btn-accent font-bold cursor-pointer transform hover:scale-105 transition shadow-xl pointer-events-auto"
-                    >
-                      ▶ Start Game
-                    </button>
-                    <p className="text-[#cbd5e1] text-xs mt-5">Press <span className="px-2 py-1 bg-[#1e293b] rounded border border-slate-600 font-mono text-amber-400">SPACE</span> or <span className="px-2 py-1 bg-[#1e293b] rounded border border-slate-600 font-mono text-amber-400">CLICK</span> to flap</p>
-                </div>
-            )}
-            
-            {/* Game Over Overlay */}
-            {isGameOver && (
-                <div className="absolute inset-0 flex items-center justify-center z-20 bg-black/80 backdrop-blur-md animate-fade-in rounded-3xl p-4">
-                    <div className="glass-panel-strong p-8 rounded-3xl shadow-2xl text-center max-w-sm w-full border border-red-500/30">
-                        <div className="text-4xl mb-2">💥</div>
-                        <h2 className="text-red-400 text-3xl font-extrabold tracking-wide mb-1">GAME OVER</h2>
-                        <div className="text-[#cbd5e1] text-sm mb-4">You hit an obstacle!</div>
-                        
-                        <div className="bg-[#1e293b]/80 p-4 rounded-2xl border border-slate-700/80 mb-6 flex justify-around">
-                          <div>
-                            <div className="text-xs text-slate-400 uppercase tracking-wider font-semibold">Score</div>
-                            <div className="text-2xl font-bold text-amber-400">{score}</div>
-                          </div>
-                          <div className="w-[1px] bg-slate-700"></div>
-                          <div>
-                            <div className="text-xs text-slate-400 uppercase tracking-wider font-semibold">Best</div>
-                            <div className="text-2xl font-bold text-emerald-400">{highScore}</div>
-                          </div>
-                        </div>
-
-                        <div className="flex gap-3 justify-center">
-                            <button onClick={(e) => { e.stopPropagation(); restartGame(); }} className="flex-1 py-2.5 text-base rounded-2xl btn-accent font-bold cursor-pointer transition">Try Again</button>
-                            <button onClick={(e) => { e.stopPropagation(); stopGame(); }} className="px-5 py-2.5 text-base rounded-2xl btn-soft text-slate-200 cursor-pointer transition">Exit</button>
-                        </div>
-                    </div>
-                </div>
-            )}
-        </div>
-    </div>
-  );
-};
-export default BirdGame;

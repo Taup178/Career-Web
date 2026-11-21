@@ -34,6 +34,7 @@ The build produces a static site in `dist/`. Tailwind utilities are compiled loc
 - `get` commands display details inside the terminal; `open work`, `open stack`, `open about`, `open contact` and `open play` take you to the corresponding portfolio section.
 - Select a Stockvel service to trace its request route, or a delivery stage to inspect an illustrative configuration. Switch Logbook views, select tasks and advance their status. Task selection and progress persist between views within each preview.
 - The Thesis chapter explorer crossfades between layered SVG scenes. Fine-pointer movement shifts the camera gently. Preview animations pause outside the viewport or when the browser tab is hidden; Appearance and reduced-motion preferences also stop transitions and camera movement.
+- Each arcade game has its own illustrated world, start and results screens, saved personal best and sound setting. Use Space or tap for Bird; arrow keys, WASD, swipes or the direction pad for Snake and Pac-Man. P pauses, Escape leaves. Leaving the tab or opening a notification pauses the run until you resume.
 
 ```text
 help                  # Five small command groups
@@ -65,6 +66,10 @@ Digital Logbook is the third project and is credited as a team project. My contr
 
 The chapter scenes are SVG illustrations, labelled as chapter studies. The hero deployment board is a labelled simulation. `status` reports local browser values, not external service health. Shared preview behavior lives in `ProjectPreview.tsx`; visual styling is in `project-previews.css`.
 
+The arcade uses a shared frame in `Arcade.tsx`, with palettes and layouts in `arcade.css`. Each game draws its own canvas world. `arcadeEngine.ts` keeps simulation coordinates independent of viewport size and display refresh rate. Canvases adapt to the available space and use up to 2× pixel density; Snake and Pac-Man interpolate movement between game ticks.
+
 ## Verification
 
 Shell tests cover navigation, completion, manuals, literal input, project actions and secret discovery. DOM interaction tests cover project ordering, view switching, mobile workspace state, focus restoration, keyboard shortcuts, theme persistence, recruiter brief, service and delivery selections, Logbook task state across views, chapter switching, unique SVG references, offscreen animation pausing, terminal history, safe rendering and all three arcade games. They do not replace visual or gameplay QA in a real browser.
+
+Arcade tests cover Bird collisions and scoring, Snake turn buffering and full-board completion, maze reachability, ghost boundaries, buffered Pac-Man turns, power pellets, crossing collisions and victory. A manual animation clock checks 60/144 Hz timing, start/restart, keyboard and touch input, pause/resume, background and notification pauses, sound preferences, personal bests, resizing and loop cleanup.

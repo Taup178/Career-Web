@@ -1,79 +1,36 @@
-// Create a single AudioContext to be reused
-let audioCtx: AudioContext | null = null;
-const getAudioContext = () => {
-  if (!audioCtx) {
-    try {
-        audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-    } catch(e) {
-        console.error("Web Audio API is not supported in this browser");
-    }
-  }
-  return audioCtx;
-};
+let context: AudioContext | null = null;
+let enabled = true;
 
-// Function to play the "eat" sound
-export const playEatSound = () => {
-  const ctx = getAudioContext();
-  if (!ctx) return;
-  const oscillator = ctx.createOscillator();
-  const gainNode = ctx.createGain();
+export function setArcadeSound(value: boolean) { enabled = value; }
+export function prepareArcadeAudio() {
+  if (!enabled) return;
+  try {
+    const Audio = window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (!Audio) return;
+    if (!context || context.state === 'closed') context = new Audio();
+    if (context.state === 'suspended') void context.resume().catch(() => {});
+  } catch { /* Audio is optional; gameplay must continue without it. */ }
+}
 
-  oscillator.connect(gainNode);
-  gainNode.connect(ctx.destination);
+function tone(from: number, to: number, duration: number, volume: number, type: OscillatorType = 'sine') {
+  if (!enabled) return;
+  prepareArcadeAudio();
+  if (!context || context.state !== 'running') return;
+  try {
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+    const time = context.currentTime;
+    oscillator.type = type;
+    oscillator.frequency.setValueAtTime(from, time);
+    oscillator.frequency.exponentialRampToValueAtTime(to, time + duration);
+    gain.gain.setValueAtTime(volume, time);
+    gain.gain.exponentialRampToValueAtTime(.0001, time + duration);
+    oscillator.connect(gain); gain.connect(context.destination);
+    oscillator.onended = () => { oscillator.disconnect(); gain.disconnect(); };
+    oscillator.start(time); oscillator.stop(time + duration);
+  } catch { /* A suspended or unavailable audio device should stay silent. */ }
+}
 
-  oscillator.type = 'sine';
-  oscillator.frequency.setValueAtTime(880, ctx.currentTime); // A6 note
-  gainNode.gain.setValueAtTime(0.3, ctx.currentTime);
-
-  gainNode.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.1);
-  oscillator.start(ctx.currentTime);
-  oscillator.stop(ctx.currentTime + 0.1);
-};
-
-// Function to play the "flap" sound (white noise)
-export const playFlapSound = () => {
-    const ctx = getAudioContext();
-    if (!ctx) return;
-
-    const bufferSize = ctx.sampleRate * 0.1; // 0.1 seconds
-    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-    const output = buffer.getChannelData(0);
-
-    for (let i = 0; i < bufferSize; i++) {
-        output[i] = Math.random() * 2 - 1;
-    }
-
-    const whiteNoiseSource = ctx.createBufferSource();
-    whiteNoiseSource.buffer = buffer;
-
-    const gainNode = ctx.createGain();
-    gainNode.gain.setValueAtTime(0.1, ctx.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
-
-    whiteNoiseSource.connect(gainNode);
-    gainNode.connect(ctx.destination);
-    whiteNoiseSource.start();
-    whiteNoiseSource.stop(ctx.currentTime + 0.1);
-};
-
-
-// Function to play the "death" sound
-export const playDeathSound = () => {
-  const ctx = getAudioContext();
-  if (!ctx) return;
-  const oscillator = ctx.createOscillator();
-  const gainNode = ctx.createGain();
-
-  oscillator.connect(gainNode);
-  gainNode.connect(ctx.destination);
-
-  oscillator.type = 'square';
-  oscillator.frequency.setValueAtTime(440, ctx.currentTime); // A4
-  gainNode.gain.setValueAtTime(0.2, ctx.currentTime);
-
-  oscillator.frequency.exponentialRampToValueAtTime(110, ctx.currentTime + 0.3);
-  gainNode.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.3);
-  
-  oscillator.start(ctx.currentTime);
-  oscillator.stop(ctx.currentTime + 0.3);
-};
+export const playEatSound = () => tone(660, 990, .09, .055);
+export const playFlapSound = () => tone(320, 510, .075, .035, 'triangle');
+export const playDeathSound = () => tone(220, 70, .3, .07, 'triangle');
